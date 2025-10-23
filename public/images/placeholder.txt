@@ -1,0 +1,54 @@
+Image Placeholders for Urban Luxury Shoe Store
+
+Required Images:
+=================
+
+Hero Section:
+- hero-shoe.png (Main floating shoe in hero)
+- hero-shoes.mp4 (Background video - shoes in motion)
+
+Product Images:
+- shoes/urban-runner-pro.jpg
+- shoes/urban-runner-pro-2.jpg  
+- shoes/urban-runner-pro-3.jpg
+- shoes/neon-street-walker.jpg
+- shoes/neon-street-walker-2.jpg
+- shoes/neon-street-walker-3.jpg
+- shoes/cyber-sport-elite.jpg
+- shoes/cyber-sport-elite-2.jpg
+- shoes/cyber-sport-elite-3.jpg
+- shoes/minimalist-luxury.jpg
+- shoes/minimalist-luxury-2.jpg
+- shoes/minimalist-luxury-3.jpg
+
+Brand & Story:
+- brand-story.jpg (Urban street scene with shoes)
+- our-story.jpg (Behind the scenes/workshop)
+- about-hero.jpg (Team or brand lifestyle shot)
+
+Team Photos:
+- team/ceo.jpg
+- team/cto.jpg  
+- team/designer.jpg
+
+Customer Testimonials:
+- testimonials/customer1.jpg
+- testimonials/customer2.jpg
+- testimonials/customer3.jpg
+- avatars/user1.jpg
+- avatars/user2.jpg
+
+Favicon:
+- favicon.ico
+
+Note: For development, you can use placeholder images from:
+- https://picsum.photos/ (random images)
+- https://unsplash.com/ (high-quality stock photos)
+- https://placeholder.com/ (simple placeholders)
+
+Recommended image sizes:
+- Hero shoe: 800x800px (PNG with transparency)
+- Product images: 800x800px (square aspect ratio)
+- Team photos: 400x400px (square)
+- Story images: 1200x800px (landscape)
+- Avatars: 100x100px (square)

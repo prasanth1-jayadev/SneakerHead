@@ -1,0 +1,301 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Search Results - Sneaker Head</title>
+    
+    <!-- Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
+    
+    <!-- Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <!-- AOS Animation Library -->
+    <link href="https://unpkg.com/aos@2.3.1/dist/aos.css" rel="stylesheet">
+    
+    <!-- Custom CSS -->
+    <link rel="stylesheet" href="/css/style.css">
+    
+    <style>
+        .search-results-page {
+            padding: 2rem 0;
+            margin-top: 80px;
+            min-height: 70vh;
+        }
+        
+        .search-header {
+            text-align: center;
+            margin-bottom: 3rem;
+        }
+        
+        .search-query {
+            color: #00FFD1;
+            font-weight: 600;
+        }
+        
+        .search-count {
+            color: #888;
+            font-size: 1.125rem;
+            margin-top: 0.5rem;
+        }
+        
+        .search-filters {
+            display: flex;
+            justify-content: center;
+            gap: 1rem;
+            margin-bottom: 2rem;
+            flex-wrap: wrap;
+        }
+        
+        .filter-chip {
+            padding: 0.5rem 1rem;
+            background: var(--bg-secondary);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 2rem;
+            color: var(--text-secondary);
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-size: 0.875rem;
+        }
+        
+        .filter-chip:hover,
+        .filter-chip.active {
+            background: #00FFD1;
+            color: #000;
+            border-color: #00FFD1;
+        }
+        
+        .no-results {
+            text-align: center;
+            padding: 4rem 2rem;
+            color: #888;
+        }
+        
+        .no-results i {
+            font-size: 5rem;
+            margin-bottom: 2rem;
+            color: #666;
+        }
+        
+        .no-results h2 {
+            margin-bottom: 1rem;
+            color: var(--text-primary);
+        }
+        
+        .search-suggestions {
+            background: var(--bg-secondary);
+            padding: 2rem;
+            border-radius: 1rem;
+            margin-top: 2rem;
+        }
+        
+        .suggestions-title {
+            margin-bottom: 1rem;
+            color: var(--text-primary);
+        }
+        
+        .suggestion-tags {
+            display: flex;
+            gap: 0.5rem;
+            flex-wrap: wrap;
+        }
+        
+        .suggestion-tag {
+            padding: 0.25rem 0.75rem;
+            background: rgba(0, 255, 209, 0.1);
+            color: #00FFD1;
+            border-radius: 1rem;
+            font-size: 0.875rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        
+        .suggestion-tag:hover {
+            background: #00FFD1;
+            color: #000;
+        }
+        
+        @media (max-width: 768px) {
+            .search-filters {
+                justify-content: flex-start;
+                overflow-x: auto;
+                padding-bottom: 0.5rem;
+            }
+            
+            .filter-chip {
+                white-space: nowrap;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Navigation -->
+    <%- include('partials/navbar') %>
+    
+    <section class="search-results-page">
+        <div class="container">
+            <div class="search-header" data-aos="fade-up">
+                <h1>Search Results</h1>
+                <% if (query) { %>
+                    <p>Results for "<span class="search-query"><%= query %></span>"</p>
+                    <div class="search-count"><%= results.length %> product<%= results.length !== 1 ? 's' : '' %> found</div>
+                <% } %>
+            </div>
+            
+            <% if (results && results.length > 0) { %>
+                <!-- Search Filters -->
+                <div class="search-filters" data-aos="fade-up" data-aos-delay="200">
+                    <div class="filter-chip active" data-filter="all">All Results</div>
+                    <div class="filter-chip" data-filter="running">Running</div>
+                    <div class="filter-chip" data-filter="casual">Casual</div>
+                    <div class="filter-chip" data-filter="sports">Sports</div>
+                </div>
+                
+                <!-- Search Results Grid -->
+                <div class="product-grid" data-aos="fade-up" data-aos-delay="400">
+                    <% results.forEach((shoe, index) => { %>
+                        <div class="product-card" data-aos="fade-up" data-aos-delay="<%= index * 50 %>" data-category="<%= shoe.category.toLowerCase() %>">
+                            <div class="product-image-container">
+                                <img src="<%= shoe.image %>" alt="<%= shoe.name %>" class="product-image" loading="lazy">
+                                
+                                <% if (shoe.new) { %>
+                                    <div class="product-badge new">New</div>
+                                <% } %>
+                                <% if (shoe.trending) { %>
+                                    <div class="product-badge trending">🔥 Hot</div>
+                                <% } %>
+                                <% if (shoe.originalPrice > shoe.price) { %>
+                                    <div class="product-badge sale">
+                                        -<%= Math.round(((shoe.originalPrice - shoe.price) / shoe.originalPrice) * 100) %>%
+                                    </div>
+                                <% } %>
+                            </div>
+                            
+                            <div class="product-info">
+                                <div class="product-brand"><%= shoe.brand %></div>
+                                <h3 class="product-name"><%= shoe.name %></h3>
+                                
+                                <div class="product-rating">
+                                    <div class="stars">
+                                        <% for (let i = 1; i <= 5; i++) { %>
+                                            <i class="fas fa-star <%= i <= Math.floor(shoe.rating) ? 'filled' : '' %>"></i>
+                                        <% } %>
+                                    </div>
+                                    <span class="rating-text">(<%= shoe.reviews %> reviews)</span>
+                                </div>
+                                
+                                <div class="product-price">
+                                    <span class="current-price">$<%= shoe.price %></span>
+                                    <% if (shoe.originalPrice > shoe.price) { %>
+                                        <span class="original-price">$<%= shoe.originalPrice %></span>
+                                    <% } %>
+                                </div>
+                                
+                                <div class="product-colors">
+                                    <% shoe.colorCodes.slice(0, 3).forEach(color => { %>
+                                        <div class="color-dot" style="background-color: <%= color %>" title="<%= color %>"></div>
+                                    <% }); %>
+                                    <% if (shoe.colors.length > 3) { %>
+                                        <span class="more-colors">+<%= shoe.colors.length - 3 %></span>
+                                    <% } %>
+                                </div>
+                                
+                                <div class="product-actions">
+                                    <a href="/product/<%= shoe.id %>" class="btn btn-primary btn-small">
+                                        <i class="fas fa-info-circle"></i>
+                                        View Details
+                                    </a>
+                                    <button class="btn btn-icon wishlist-btn" data-product-id="<%= shoe.id %>" title="Add to Wishlist">
+                                        <i class="far fa-heart"></i>
+                                    </button>
+                                    <button class="btn btn-icon add-to-cart-btn" data-product-id="<%= shoe.id %>" title="Add to Cart">
+                                        <i class="fas fa-shopping-bag"></i>
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    <% }); %>
+                </div>
+            <% } else { %>
+                <!-- No Results -->
+                <div class="no-results" data-aos="fade-up">
+                    <i class="fas fa-search"></i>
+                    <h2>No results found</h2>
+                    <% if (query) { %>
+                        <p>We couldn't find any products matching "<%= query %>"</p>
+                    <% } else { %>
+                        <p>Please enter a search term to find products</p>
+                    <% } %>
+                    
+                    <div class="search-suggestions">
+                        <h3 class="suggestions-title">Try searching for:</h3>
+                        <div class="suggestion-tags">
+                            <span class="suggestion-tag" onclick="searchFor('nike')">Nike</span>
+                            <span class="suggestion-tag" onclick="searchFor('adidas')">Adidas</span>
+                            <span class="suggestion-tag" onclick="searchFor('running')">Running</span>
+                            <span class="suggestion-tag" onclick="searchFor('casual')">Casual</span>
+                            <span class="suggestion-tag" onclick="searchFor('boost')">Boost</span>
+                            <span class="suggestion-tag" onclick="searchFor('air max')">Air Max</span>
+                            <span class="suggestion-tag" onclick="searchFor('jordan')">Jordan</span>
+                            <span class="suggestion-tag" onclick="searchFor('white')">White</span>
+                        </div>
+                    </div>
+                    
+                    <a href="/products" class="btn btn-primary" style="margin-top: 2rem;">
+                        <i class="fas fa-shopping-bag"></i>
+                        Browse All Products
+                    </a>
+                </div>
+            <% } %>
+        </div>
+    </section>
+    
+    <!-- Footer -->
+    <%- include('partials/footer') %>
+    
+    <!-- Scripts -->
+    <script src="https://unpkg.com/aos@2.3.1/dist/aos.js"></script>
+    <script src="/js/main.js"></script>
+    <script>
+        // Initialize AOS
+        AOS.init({
+            duration: 800,
+            easing: 'ease-in-out',
+            once: true,
+            offset: 100
+        });
+        
+        // Filter functionality
+        document.querySelectorAll('.filter-chip').forEach(chip => {
+            chip.addEventListener('click', () => {
+                const filter = chip.getAttribute('data-filter');
+                
+                // Update active filter
+                document.querySelectorAll('.filter-chip').forEach(c => c.classList.remove('active'));
+                chip.classList.add('active');
+                
+                // Filter products
+                document.querySelectorAll('.product-card').forEach(card => {
+                    const category = card.getAttribute('data-category');
+                    if (filter === 'all' || category === filter) {
+                        card.style.display = 'block';
+                    } else {
+                        card.style.display = 'none';
+                    }
+                });
+            });
+        });
+        
+        // Search suggestion functionality
+        function searchFor(term) {
+            const searchInput = document.getElementById('search-input');
+            if (searchInput) {
+                searchInput.value = term;
+                // Trigger search
+                window.location.href = `/search?q=${encodeURIComponent(term)}`;
+            }
+        }
+    </script>
+</body>
+</html>

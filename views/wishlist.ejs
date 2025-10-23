@@ -1,0 +1,158 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Wishlist - Sneaker Head</title>
+    
+    <!-- Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
+    
+    <!-- Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <!-- Custom CSS -->
+    <link rel="stylesheet" href="/css/style.css">
+    
+    <style>
+        .wishlist-page {
+            padding: 2rem 0;
+            margin-top: 80px;
+            min-height: 70vh;
+        }
+        
+        .wishlist-header {
+            text-align: center;
+            margin-bottom: 3rem;
+        }
+        
+        .wishlist-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+            gap: 2rem;
+        }
+        
+        .wishlist-item {
+            background: var(--bg-secondary);
+            border-radius: 1rem;
+            overflow: hidden;
+            transition: transform 0.3s ease;
+            position: relative;
+        }
+        
+        .wishlist-item:hover {
+            transform: translateY(-5px);
+        }
+        
+        .wishlist-image {
+            aspect-ratio: 1;
+            overflow: hidden;
+        }
+        
+        .wishlist-image img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+        
+        .wishlist-info {
+            padding: 1.5rem;
+        }
+        
+        .wishlist-brand {
+            font-size: 0.875rem;
+            color: #888;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin-bottom: 0.5rem;
+        }
+        
+        .wishlist-name {
+            font-size: 1.25rem;
+            font-weight: 600;
+            margin-bottom: 1rem;
+        }
+        
+        .wishlist-price {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: #00FFD1;
+            margin-bottom: 1rem;
+        }
+        
+        .wishlist-actions {
+            display: flex;
+            gap: 0.5rem;
+        }
+        
+        .remove-wishlist {
+            position: absolute;
+            top: 1rem;
+            right: 1rem;
+            background: rgba(255, 71, 87, 0.9);
+            color: white;
+            border: none;
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.3s ease;
+        }
+        
+        .remove-wishlist:hover {
+            background: #FF4757;
+            transform: scale(1.1);
+        }
+        
+        .empty-wishlist {
+            text-align: center;
+            padding: 4rem 2rem;
+            color: #888;
+        }
+        
+        .empty-wishlist i {
+            font-size: 5rem;
+            margin-bottom: 2rem;
+            color: #666;
+        }
+        
+        .empty-wishlist h2 {
+            margin-bottom: 1rem;
+            color: var(--text-primary);
+        }
+        
+        @media (max-width: 768px) {
+            .wishlist-grid {
+                grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+                gap: 1rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Navigation -->
+    <%- include('partials/navbar') %>
+    
+    <section class="wishlist-page">
+        <div class="container">
+            <div class="wishlist-header">
+                <h1>My Wishlist</h1>
+                <p>Your favorite sneakers saved for later</p>
+            </div>
+            
+            <div class="wishlist-grid" id="wishlist-container">
+                <!-- Wishlist items will be loaded here -->
+            </div>
+        </div>
+    </section>
+    
+    <!-- Footer -->
+    <%- include('partials/footer') %>
+    
+    <script src="/js/main.js"></script>
+    <script src="/js/wishlist.js"></script>
+</body>
+</html>

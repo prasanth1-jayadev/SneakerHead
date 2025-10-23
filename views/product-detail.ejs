@@ -1,0 +1,540 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title><%= title %></title>
+    
+    <!-- Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
+    
+    <!-- Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <!-- AOS Animation Library -->
+    <link href="https://unpkg.com/aos@2.3.1/dist/aos.css" rel="stylesheet">
+    
+    <!-- Custom CSS -->
+    <link rel="stylesheet" href="/css/style.css">
+    
+    <style>
+        .product-detail-page {
+            padding: 2rem 0;
+            margin-top: 80px;
+        }
+        
+        .breadcrumb {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            margin-bottom: 2rem;
+            font-size: 0.875rem;
+            color: #888;
+        }
+        
+        .breadcrumb a {
+            color: #888;
+            text-decoration: none;
+        }
+        
+        .breadcrumb a:hover {
+            color: #00FFD1;
+        }
+        
+        .product-detail-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 3rem;
+            margin-bottom: 3rem;
+        }
+        
+        .product-images {
+            position: sticky;
+            top: 100px;
+            height: fit-content;
+        }
+        
+        .main-image-container {
+            position: relative;
+            aspect-ratio: 1;
+            border-radius: 1rem;
+            overflow: hidden;
+            margin-bottom: 1rem;
+            background: var(--bg-secondary);
+        }
+        
+        .main-product-image {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+        
+        .thumbnail-images {
+            display: flex;
+            gap: 1rem;
+        }
+        
+        .thumbnail {
+            flex: 1;
+            aspect-ratio: 1;
+            border-radius: 0.5rem;
+            overflow: hidden;
+            cursor: pointer;
+            border: 2px solid transparent;
+            transition: border-color 0.3s ease;
+        }
+        
+        .thumbnail.active {
+            border-color: #00FFD1;
+        }
+        
+        .thumbnail img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+        
+        .product-info-detail {
+            padding: 1rem 0;
+        }
+        
+        .product-badges {
+            display: flex;
+            gap: 0.5rem;
+            margin-bottom: 1rem;
+        }
+        
+        .badge {
+            padding: 0.25rem 0.5rem;
+            border-radius: 0.5rem;
+            font-size: 0.75rem;
+            font-weight: 600;
+            text-transform: uppercase;
+        }
+        
+        .badge.new {
+            background: #00FF88;
+            color: #000;
+        }
+        
+        .badge.trending {
+            background: #FF5F1F;
+            color: white;
+        }
+        
+        .brand-name {
+            font-size: 0.875rem;
+            color: #888;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin-bottom: 0.5rem;
+        }
+        
+        .product-title {
+            font-size: 2.5rem;
+            margin-bottom: 1rem;
+            color: var(--text-primary);
+        }
+        
+        .rating-section {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            margin-bottom: 1rem;
+        }
+        
+        .stars-large {
+            display: flex;
+            gap: 4px;
+        }
+        
+        .stars-large i {
+            font-size: 1.25rem;
+            color: #666;
+        }
+        
+        .stars-large i.filled {
+            color: #FFD700;
+        }
+        
+        .price-section {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            margin-bottom: 1rem;
+        }
+        
+        .current-price {
+            font-size: 2.5rem;
+            font-weight: 800;
+            color: #00FFD1;
+        }
+        
+        .original-price {
+            font-size: 1.5rem;
+            color: #888;
+            text-decoration: line-through;
+        }
+        
+        .discount-badge {
+            background: #FF5F1F;
+            color: white;
+            padding: 0.25rem 0.5rem;
+            border-radius: 0.5rem;
+            font-size: 0.875rem;
+            font-weight: 600;
+        }
+        
+        .product-description {
+            font-size: 1.125rem;
+            line-height: 1.8;
+            margin-bottom: 2rem;
+            color: var(--text-secondary);
+        }
+        
+        .selection-group {
+            margin-bottom: 1.5rem;
+        }
+        
+        .selection-label {
+            display: block;
+            font-weight: 600;
+            margin-bottom: 1rem;
+            font-size: 1.125rem;
+        }
+        
+        .color-options {
+            display: flex;
+            gap: 1rem;
+            margin-bottom: 0.5rem;
+        }
+        
+        .color-option {
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            cursor: pointer;
+            border: 3px solid transparent;
+            transition: all 0.3s ease;
+            position: relative;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .color-option.selected {
+            border-color: #00FFD1;
+            transform: scale(1.1);
+        }
+        
+        .size-options {
+            display: flex;
+            gap: 1rem;
+            flex-wrap: wrap;
+        }
+        
+        .size-option {
+            width: 50px;
+            height: 50px;
+            border: 2px solid #666;
+            border-radius: 0.5rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            font-weight: 600;
+            transition: all 0.3s ease;
+        }
+        
+        .size-option:hover,
+        .size-option.selected {
+            border-color: #00FFD1;
+            background: #00FFD1;
+            color: #000;
+        }
+        
+        .action-buttons {
+            display: flex;
+            gap: 1rem;
+            margin-bottom: 2rem;
+        }
+        
+        .add-to-cart-detail {
+            flex: 2;
+        }
+        
+        .wishlist-btn {
+            flex: 1;
+        }
+        
+        .product-features {
+            background: var(--bg-secondary);
+            padding: 1.5rem;
+            border-radius: 1rem;
+            margin-bottom: 1.5rem;
+        }
+        
+        .product-features h3 {
+            margin-bottom: 1rem;
+            font-size: 1.25rem;
+        }
+        
+        .features-list {
+            list-style: none;
+        }
+        
+        .features-list li {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            margin-bottom: 0.5rem;
+            color: var(--text-secondary);
+        }
+        
+        .features-list i {
+            color: #00FF88;
+            font-size: 0.875rem;
+        }
+        
+        .related-products-section {
+            margin-top: 3rem;
+        }
+        
+        .related-products-section h2 {
+            text-align: center;
+            margin-bottom: 2rem;
+            font-size: 2rem;
+        }
+        
+        .related-products-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 1.5rem;
+        }
+        
+        @media (max-width: 768px) {
+            .product-detail-grid {
+                grid-template-columns: 1fr;
+                gap: 2rem;
+            }
+            
+            .product-images {
+                position: static;
+            }
+            
+            .action-buttons {
+                flex-direction: column;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Navigation -->
+    <%- include('partials/navbar') %>
+    
+    <section class="product-detail-page">
+        <div class="container">
+            <!-- Breadcrumb -->
+            <nav class="breadcrumb" data-aos="fade-right">
+                <a href="/">Home</a>
+                <i class="fas fa-chevron-right"></i>
+                <a href="/products">Products</a>
+                <i class="fas fa-chevron-right"></i>
+                <span><%= shoe.name %></span>
+            </nav>
+            
+            <div class="product-detail-grid">
+                <!-- Product Images -->
+                <div class="product-images" data-aos="fade-right">
+                    <div class="main-image-container">
+                        <img src="<%= shoe.image %>" alt="<%= shoe.name %>" class="main-product-image" id="main-image">
+                    </div>
+                    
+                    <div class="thumbnail-images">
+                        <% shoe.images.forEach((image, index) => { %>
+                            <div class="thumbnail <%= index === 0 ? 'active' : '' %>" data-image="<%= image %>">
+                                <img src="<%= image %>" alt="<%= shoe.name %> view <%= index + 1 %>">
+                            </div>
+                        <% }); %>
+                    </div>
+                </div>
+                
+                <!-- Product Info -->
+                <div class="product-info-detail" data-aos="fade-left">
+                    <div class="product-badges">
+                        <% if (shoe.new) { %>
+                            <span class="badge new">New Arrival</span>
+                        <% } %>
+                        <% if (shoe.trending) { %>
+                            <span class="badge trending">🔥 Trending</span>
+                        <% } %>
+                    </div>
+                    
+                    <div class="brand-name"><%= shoe.brand %></div>
+                    <h1 class="product-title"><%= shoe.name %></h1>
+                    
+                    <div class="rating-section">
+                        <div class="stars-large">
+                            <% for (let i = 1; i <= 5; i++) { %>
+                                <i class="fas fa-star <%= i <= Math.floor(shoe.rating) ? 'filled' : '' %>"></i>
+                            <% } %>
+                        </div>
+                        <span class="rating-text"><%= shoe.rating %> (<%= shoe.reviews %> reviews)</span>
+                    </div>
+                    
+                    <div class="price-section">
+                        <div class="current-price">$<%= shoe.price %></div>
+                        <% if (shoe.originalPrice > shoe.price) { %>
+                            <div class="original-price">$<%= shoe.originalPrice %></div>
+                            <div class="discount-badge">
+                                <%= Math.round(((shoe.originalPrice - shoe.price) / shoe.originalPrice) * 100) %>% OFF
+                            </div>
+                        <% } %>
+                    </div>
+                    
+                    <div class="product-description">
+                        <p><%= shoe.description %></p>
+                    </div>
+                    
+                    <!-- Color Selection -->
+                    <div class="selection-group">
+                        <label class="selection-label">Available Colors</label>
+                        <div class="color-options">
+                            <% shoe.colorCodes.forEach((color, index) => { %>
+                                <div class="color-option <%= index === 0 ? 'selected' : '' %>" 
+                                     data-color="<%= shoe.colors[index] %>" 
+                                     style="background-color: <%= color %>"
+                                     title="<%= shoe.colors[index] %>">
+                                </div>
+                            <% }); %>
+                        </div>
+                    </div>
+                    
+                    <!-- Size Selection -->
+                    <div class="selection-group">
+                        <label class="selection-label">Size (US)</label>
+                        <div class="size-options">
+                            <% shoe.sizes.forEach(size => { %>
+                                <div class="size-option" data-size="<%= size %>">
+                                    <%= size %>
+                                </div>
+                            <% }); %>
+                        </div>
+                    </div>
+                    
+                    <!-- Action Buttons -->
+                    <div class="action-buttons">
+                        <button class="btn btn-primary btn-large add-to-cart-detail" 
+                                data-product-id="<%= shoe.id %>">
+                            <i class="fas fa-shopping-bag"></i>
+                            Add to Cart - $<%= shoe.price %>
+                        </button>
+                        <button class="btn btn-outline btn-large wishlist-btn" data-product-id="<%= shoe.id %>">
+                            <i class="far fa-heart"></i>
+                            Wishlist
+                        </button>
+                    </div>
+                    
+                    <!-- Features -->
+                    <div class="product-features">
+                        <h3>Key Features</h3>
+                        <ul class="features-list">
+                            <% shoe.features.forEach(feature => { %>
+                                <li><i class="fas fa-check"></i> <%= feature %></li>
+                            <% }); %>
+                        </ul>
+                    </div>
+                    
+                    <!-- Product Details -->
+                    <div class="product-features">
+                        <h3>Product Details</h3>
+                        <ul class="features-list">
+                            <li><i class="fas fa-info-circle"></i> Material: <%= shoe.material %></li>
+                            <li><i class="fas fa-weight"></i> Weight: <%= shoe.weight %></li>
+                            <li><i class="fas fa-palette"></i> Available in <%= shoe.colors.length %> colors</li>
+                            <li><i class="fas fa-ruler"></i> Sizes: <%= shoe.sizes.join(', ') %> US</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Related Products -->
+            <% if (relatedShoes && relatedShoes.length > 0) { %>
+                <div class="related-products-section" data-aos="fade-up">
+                    <h2>You Might Also Like</h2>
+                    <div class="related-products-grid">
+                        <% relatedShoes.forEach((relatedShoe, index) => { %>
+                            <div class="product-card" data-aos="fade-up" data-aos-delay="<%= index * 100 %>">
+                                <div class="product-image-container">
+                                    <img src="<%= relatedShoe.image %>" alt="<%= relatedShoe.name %>" class="product-image">
+                                </div>
+                                <div class="product-info">
+                                    <div class="product-brand"><%= relatedShoe.brand %></div>
+                                    <h3 class="product-name"><%= relatedShoe.name %></h3>
+                                    <div class="product-price">
+                                        <span class="current-price">$<%= relatedShoe.price %></span>
+                                    </div>
+                                    <div class="product-actions">
+                                        <a href="/product/<%= relatedShoe.id %>" class="btn btn-primary btn-small">
+                                            View Details
+                                        </a>
+                                    </div>
+                                </div>
+                            </div>
+                        <% }); %>
+                    </div>
+                </div>
+            <% } %>
+        </div>
+    </section>
+    
+    <!-- Footer -->
+    <%- include('partials/footer') %>
+    
+    <!-- Scripts -->
+    <script src="https://unpkg.com/aos@2.3.1/dist/aos.js"></script>
+    <script src="/js/main.js"></script>
+    <script>
+        // Initialize AOS
+        AOS.init({
+            duration: 800,
+            easing: 'ease-in-out',
+            once: true,
+            offset: 100
+        });
+        
+        // Image gallery functionality
+        document.querySelectorAll('.thumbnail').forEach(thumbnail => {
+            thumbnail.addEventListener('click', () => {
+                const newImageSrc = thumbnail.getAttribute('data-image');
+                const mainImage = document.getElementById('main-image');
+                
+                // Remove active class from all thumbnails
+                document.querySelectorAll('.thumbnail').forEach(thumb => thumb.classList.remove('active'));
+                
+                // Add active class to clicked thumbnail
+                thumbnail.classList.add('active');
+                
+                // Change main image
+                mainImage.src = newImageSrc;
+            });
+        });
+        
+        // Color selection
+        document.querySelectorAll('.color-option').forEach(option => {
+            option.addEventListener('click', () => {
+                document.querySelectorAll('.color-option').forEach(opt => opt.classList.remove('selected'));
+                option.classList.add('selected');
+            });
+        });
+        
+        // Size selection
+        document.querySelectorAll('.size-option').forEach(option => {
+            option.addEventListener('click', () => {
+                document.querySelectorAll('.size-option').forEach(opt => opt.classList.remove('selected'));
+                option.classList.add('selected');
+            });
+        });
+    </script>
+</body>
+</html>

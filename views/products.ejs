@@ -1,0 +1,1006 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>
+        <%= title %>
+    </title>
+
+    <!-- Fonts -->
+    <link
+        href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&family=Inter:wght@300;400;500;600&display=swap"
+        rel="stylesheet">
+
+    <!-- Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+    <!-- AOS Animation Library -->
+    <link href="https://unpkg.com/aos@2.3.1/dist/aos.css" rel="stylesheet">
+
+    <!-- Custom CSS -->
+    <link rel="stylesheet" href="/css/style.css">
+
+    <style>
+        .products-page {
+            padding: 2rem 0;
+            margin-top: 80px;
+        }
+
+        .page-header {
+            text-align: center;
+            margin-bottom: 3rem;
+        }
+
+        .page-title {
+            font-size: clamp(2.5rem, 4vw, 3.5rem);
+            margin-bottom: 1rem;
+        }
+
+        .page-subtitle {
+            font-size: 1.125rem;
+            color: var(--text-secondary);
+        }
+
+        .filters-section {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 2rem;
+            padding: 1rem;
+            background: var(--bg-secondary);
+            border-radius: 1rem;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .filters-left {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        .category-filters {
+            display: flex;
+            gap: 0.5rem;
+        }
+
+        .filter-btn {
+            padding: 0.5rem 1rem;
+            background: transparent;
+            border: 2px solid var(--text-muted);
+            color: var(--text-secondary);
+            border-radius: 0.5rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-weight: 500;
+        }
+
+        .filter-btn:hover,
+        .filter-btn.active {
+            border-color: var(--accent-primary);
+            background: var(--accent-primary);
+            color: var(--bg-primary);
+        }
+
+        .filters-right {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        .sort-dropdown select {
+            padding: 0.5rem 1rem;
+            background: var(--bg-tertiary);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            color: var(--text-primary);
+            border-radius: 0.5rem;
+            cursor: pointer;
+        }
+
+        .view-toggle {
+            display: flex;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 0.5rem;
+            overflow: hidden;
+        }
+
+        .view-btn {
+            padding: 0.5rem 1rem;
+            background: var(--bg-tertiary);
+            border: none;
+            color: var(--text-secondary);
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .view-btn.active,
+        .view-btn:hover {
+            background: var(--accent-primary);
+            color: var(--bg-primary);
+        }
+
+        .products-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+            gap: 2rem;
+            margin-bottom: 2rem;
+        }
+
+        .overlay-buttons {
+            display: flex;
+            gap: 0.5rem;
+        }
+
+        .overlay-btn {
+            background: rgba(255, 255, 255, 0.9);
+            color: var(--bg-primary);
+            border: none;
+            padding: 0.5rem 1rem;
+            border-radius: 0.5rem;
+            font-size: 0.875rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .overlay-btn:hover {
+            background: var(--accent-primary);
+            color: white;
+        }
+
+        .product-colors {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            margin-bottom: 1rem;
+        }
+
+        .color-dot {
+            width: 16px;
+            height: 16px;
+            border-radius: 50%;
+            border: 2px solid rgba(255, 255, 255, 0.2);
+        }
+
+        .more-colors {
+            font-size: 0.75rem;
+            color: var(--text-muted);
+            margin-left: 0.5rem;
+        }
+
+        /* Search and Filter Styles */
+        .search-filter-section {
+            margin-bottom: 2rem;
+        }
+
+        .search-section {
+            margin-bottom: 1.5rem;
+        }
+
+        .search-form {
+            display: flex;
+            justify-content: center;
+        }
+
+        .search-input-group {
+            position: relative;
+            max-width: 500px;
+            width: 100%;
+        }
+
+        .search-input-group input {
+            width: 100%;
+            padding: 1rem 3rem 1rem 1rem;
+            border: 2px solid rgba(255, 255, 255, 0.1);
+            border-radius: 2rem;
+            background: var(--bg-secondary);
+            color: var(--text-primary);
+            font-size: 1rem;
+        }
+
+        .search-btn {
+            position: absolute;
+            right: 0.5rem;
+            top: 50%;
+            transform: translateY(-50%);
+            background: var(--accent-primary);
+            border: none;
+            border-radius: 50%;
+            width: 2.5rem;
+            height: 2.5rem;
+            color: var(--bg-primary);
+            cursor: pointer;
+        }
+
+        .clear-search-btn {
+            position: absolute;
+            right: 3.5rem;
+            top: 50%;
+            transform: translateY(-50%);
+            background: var(--error);
+            border: none;
+            border-radius: 50%;
+            width: 2rem;
+            height: 2rem;
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            text-decoration: none;
+            font-size: 0.8rem;
+        }
+
+        .filters-section {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-end;
+            gap: 2rem;
+            padding: 1.5rem;
+            background: var(--bg-secondary);
+            border-radius: 1rem;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            flex-wrap: wrap;
+        }
+
+        .filters-left {
+            display: flex;
+            gap: 2rem;
+            flex-wrap: wrap;
+            flex: 1;
+        }
+
+        .filter-group {
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem;
+        }
+
+        .filter-group label {
+            font-size: 0.9rem;
+            color: var(--text-secondary);
+            font-weight: 500;
+        }
+
+        .price-filter {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .price-filter input {
+            width: 80px;
+            padding: 0.5rem;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            border-radius: 0.25rem;
+            background: var(--bg-tertiary);
+            color: var(--text-primary);
+        }
+
+        .apply-price-btn {
+            padding: 0.5rem 1rem;
+            background: var(--accent-primary);
+            color: var(--bg-primary);
+            border: none;
+            border-radius: 0.25rem;
+            cursor: pointer;
+            font-size: 0.8rem;
+        }
+
+        #brand-select {
+            padding: 0.5rem;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            border-radius: 0.25rem;
+            background: var(--bg-tertiary);
+            color: var(--text-primary);
+            min-width: 120px;
+        }
+
+        .results-info {
+            font-size: 0.9rem;
+            color: var(--text-muted);
+            white-space: nowrap;
+        }
+
+        /* Pagination Styles */
+        .pagination-section {
+            margin-top: 3rem;
+            text-align: center;
+        }
+
+        .pagination {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            background: var(--bg-secondary);
+            padding: 1rem;
+            border-radius: 1rem;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .pagination-btn {
+            padding: 0.75rem 1rem;
+            background: transparent;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            border-radius: 0.5rem;
+            color: var(--text-secondary);
+            text-decoration: none;
+            transition: all 0.3s ease;
+            font-weight: 500;
+            min-width: 2.5rem;
+            text-align: center;
+        }
+
+        .pagination-btn:hover {
+            background: var(--accent-primary);
+            color: var(--bg-primary);
+            border-color: var(--accent-primary);
+        }
+
+        .pagination-btn.active {
+            background: var(--accent-primary);
+            color: var(--bg-primary);
+            border-color: var(--accent-primary);
+        }
+
+        .pagination-dots {
+            color: var(--text-muted);
+            padding: 0 0.5rem;
+        }
+
+        /* Modal Styles */
+        .modal {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 10000;
+            display: none;
+        }
+
+        .modal.active {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .modal-overlay {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.8);
+            backdrop-filter: blur(5px);
+        }
+
+        .modal-content {
+            position: relative;
+            background: var(--bg-primary);
+            border-radius: 1rem;
+            max-width: 90vw;
+            max-height: 90vh;
+            overflow-y: auto;
+            z-index: 1;
+        }
+
+        .modal-close {
+            position: absolute;
+            top: 1rem;
+            right: 1rem;
+            background: var(--bg-secondary);
+            border: none;
+            color: var(--text-secondary);
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            cursor: pointer;
+            z-index: 2;
+            transition: all 0.3s ease;
+        }
+
+        .modal-close:hover {
+            background: var(--error);
+            color: white;
+        }
+
+        /* Quick View Specific Styles */
+        .quick-view-loading {
+            text-align: center;
+            padding: 3rem;
+            color: var(--text-secondary);
+        }
+
+        .loading-spinner i {
+            font-size: 2rem;
+            color: var(--accent-primary);
+            margin-bottom: 1rem;
+        }
+
+        .quick-view-error {
+            text-align: center;
+            padding: 3rem;
+            color: var(--text-secondary);
+        }
+
+        .quick-view-error i {
+            font-size: 3rem;
+            color: var(--error);
+            margin-bottom: 1rem;
+        }
+
+        .quick-view-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 2rem;
+            padding: 2rem;
+            max-width: 900px;
+        }
+
+        .quick-view-image {
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+        }
+
+        .main-quick-image {
+            width: 100%;
+            aspect-ratio: 1;
+            object-fit: cover;
+            border-radius: 0.5rem;
+        }
+
+        .quick-view-thumbnails {
+            display: flex;
+            gap: 0.5rem;
+        }
+
+        .thumbnail-quick {
+            width: 60px;
+            height: 60px;
+            object-fit: cover;
+            border-radius: 0.25rem;
+            cursor: pointer;
+            border: 2px solid transparent;
+            transition: all 0.3s ease;
+        }
+
+        .thumbnail-quick:hover,
+        .thumbnail-quick.active {
+            border-color: var(--accent-primary);
+        }
+
+        .quick-view-info {
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+        }
+
+        .quick-view-brand {
+            font-size: 0.875rem;
+            color: var(--text-muted);
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .quick-view-title {
+            font-size: 1.5rem;
+            margin: 0;
+            color: var(--text-primary);
+        }
+
+        .quick-view-badges {
+            display: flex;
+            gap: 0.5rem;
+        }
+
+        .quick-view-rating {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .quick-view-price {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        .quick-view-price .current-price {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: var(--accent-primary);
+        }
+
+        .quick-view-price .original-price {
+            font-size: 1rem;
+            color: var(--text-muted);
+            text-decoration: line-through;
+        }
+
+        .quick-view-description {
+            color: var(--text-secondary);
+            line-height: 1.6;
+            margin: 0;
+        }
+
+        .quick-view-options {
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+        }
+
+        .option-group label {
+            display: block;
+            font-weight: 600;
+            margin-bottom: 0.5rem;
+            color: var(--text-primary);
+        }
+
+        .color-options {
+            display: flex;
+            gap: 0.5rem;
+        }
+
+        .color-option {
+            width: 30px;
+            height: 30px;
+            border-radius: 50%;
+            cursor: pointer;
+            border: 2px solid transparent;
+            transition: all 0.3s ease;
+        }
+
+        .color-option:hover,
+        .color-option.selected {
+            border-color: var(--accent-primary);
+            transform: scale(1.1);
+        }
+
+        .size-options {
+            display: flex;
+            gap: 0.5rem;
+            flex-wrap: wrap;
+        }
+
+        .size-option {
+            padding: 0.5rem 1rem;
+            border: 1px solid var(--text-muted);
+            border-radius: 0.25rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-weight: 500;
+        }
+
+        .size-option:hover,
+        .size-option.selected {
+            border-color: var(--accent-primary);
+            background: var(--accent-primary);
+            color: var(--bg-primary);
+        }
+
+        .quick-view-details {
+            background: var(--bg-secondary);
+            padding: 1rem;
+            border-radius: 0.5rem;
+        }
+
+        .detail-item {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 0.5rem;
+        }
+
+        .detail-item:last-child {
+            margin-bottom: 0;
+        }
+
+        .detail-item .label {
+            color: var(--text-muted);
+        }
+
+        .detail-item .value {
+            color: var(--accent-primary);
+            font-weight: 500;
+        }
+
+        .quick-view-actions {
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem;
+        }
+
+        @media (max-width: 768px) {
+            .quick-view-grid {
+                grid-template-columns: 1fr;
+                padding: 1rem;
+            }
+
+            .quick-view-actions {
+                flex-direction: column;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .filters-section {
+                flex-direction: column;
+                gap: 1rem;
+                align-items: stretch;
+            }
+
+            .filters-left,
+            .filters-right {
+                justify-content: center;
+            }
+
+            .category-filters {
+                flex-wrap: wrap;
+                justify-content: center;
+            }
+
+            .products-grid {
+                grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+                gap: 1rem;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .products-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <!-- Navigation -->
+    <%- include('partials/navbar') %>
+
+        <section class="products-page">
+            <div class="container">
+                <!-- Page Header -->
+                <div class="page-header" data-aos="fade-up">
+                    <h1 class="page-title">Our Collection</h1>
+                    <p class="page-subtitle">Discover the perfect pair for your style</p>
+                </div>
+
+                <!-- Search and Filters -->
+                <div class="search-filter-section" data-aos="fade-up" data-aos-delay="200">
+                    <!-- Search Bar -->
+                    <div class="search-section">
+                        <form class="search-form" method="GET">
+                            <div class="search-input-group">
+                                <input type="text" name="search" placeholder="Search products..."
+                                    value="<%= currentSearch %>">
+                                <button type="submit" class="search-btn">
+                                    <i class="fas fa-search"></i>
+                                </button>
+                                <% if (currentSearch) { %>
+                                    <a href="/products" class="clear-search-btn">
+                                        <i class="fas fa-times"></i>
+                                    </a>
+                                    <% } %>
+                            </div>
+
+                            <!-- Hidden inputs to preserve other filters -->
+                            <input type="hidden" name="category" value="<%= currentCategory %>">
+                            <input type="hidden" name="sort" value="<%= currentSort %>">
+                            <input type="hidden" name="minPrice" value="<%= minPrice %>">
+                            <input type="hidden" name="maxPrice" value="<%= maxPrice %>">
+                            <input type="hidden" name="brand" value="<%= currentBrand %>">
+                        </form>
+                    </div>
+
+                    <!-- Filters -->
+                    <div class="filters-section">
+                        <div class="filters-left">
+                            <!-- Category Filters -->
+                            <div class="filter-group">
+                                <label>Category:</label>
+                                <div class="category-filters">
+                                    <button class="filter-btn <%= currentCategory === 'all' ? 'active' : '' %>"
+                                        data-category="all">All</button>
+                                    <button class="filter-btn <%= currentCategory === 'running' ? 'active' : '' %>"
+                                        data-category="running">Running</button>
+                                    <button class="filter-btn <%= currentCategory === 'casual' ? 'active' : '' %>"
+                                        data-category="casual">Casual</button>
+                                    <button class="filter-btn <%= currentCategory === 'sports' ? 'active' : '' %>"
+                                        data-category="sports">Sports</button>
+                                </div>
+                            </div>
+
+                            <!-- Price Range Filter -->
+                            <div class="filter-group">
+                                <label>Price Range:</label>
+                                <div class="price-filter">
+                                    <input type="number" id="minPrice" placeholder="Min" value="<%= minPrice %>">
+                                    <span>-</span>
+                                    <input type="number" id="maxPrice" placeholder="Max" value="<%= maxPrice %>">
+                                    <button class="apply-price-btn">Apply</button>
+                                </div>
+                            </div>
+
+                            <!-- Brand Filter -->
+                            <div class="filter-group">
+                                <label>Brand:</label>
+                                <select id="brand-select">
+                                    <option value="">All Brands</option>
+                                    <% brands.forEach(brand=> { %>
+                                        <option value="<%= brand %>" <%=currentBrand===brand ? 'selected' : '' %>><%=
+                                                brand %>
+                                        </option>
+                                        <% }); %>
+                                </select>
+                            </div>
+                        </div>
+
+                        <div class="filters-right">
+                            <div class="sort-dropdown">
+                                <select id="sort-select">
+                                    <option value="default" <%=currentSort==='default' ? 'selected' : '' %>>Sort by
+                                    </option>
+                                    <option value="price-low" <%=currentSort==='price-low' ? 'selected' : '' %>>Price:
+                                        Low to High</option>
+                                    <option value="price-high" <%=currentSort==='price-high' ? 'selected' : '' %>>Price:
+                                        High to Low</option>
+                                    <option value="name-asc" <%=currentSort==='name-asc' ? 'selected' : '' %>>Name: A -
+                                        Z</option>
+                                    <option value="name-desc" <%=currentSort==='name-desc' ? 'selected' : '' %>>Name: Z
+                                        - A</option>
+                                    <option value="rating" <%=currentSort==='rating' ? 'selected' : '' %>>Highest Rated
+                                    </option>
+                                    <option value="new-arrivals" <%=currentSort==='new-arrivals' ? 'selected' : '' %>
+                                        >New Arrivals</option>
+                                </select>
+                            </div>
+
+                            <div class="results-info">
+                                Showing <%= shoes.length %> of <%= totalProducts %> products
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Products Grid -->
+                <div class="products-grid" id="products-grid">
+                    <% shoes.forEach(function(shoe, index) { %>
+                        <div class="product-card" data-aos="fade-up" data-aos-delay="<%= index * 50 %>"
+                            data-category="<%= shoe.category.toLowerCase() %>">
+                            <div class="product-image-container">
+                                <img src="<%= shoe.image %>" alt="<%= shoe.name %>" class="product-image">
+                                <div class="product-overlay">
+                                    <div class="overlay-buttons">
+                                        <button class="overlay-btn quick-view-btn" data-product-id="<%= shoe.id %>">
+                                            <i class="fas fa-eye"></i>
+                                            <span>Quick View</span>
+                                        </button>
+                                        <button class="overlay-btn wishlist-btn" data-product-id="<%= shoe.id %>">
+                                            <i class="far fa-heart"></i>
+                                            <span>Wishlist</span>
+                                        </button>
+                                    </div>
+                                </div>
+
+                                <!-- Product Badges -->
+                                <div class="product-badges">
+                                    <% if (shoe.new) { %>
+                                        <div class="product-badge new">New</div>
+                                        <% } %>
+                                            <% if (shoe.trending) { %>
+                                                <div class="product-badge trending">🔥 Hot</div>
+                                                <% } %>
+                                                    <% if (shoe.originalPrice> shoe.price) { %>
+                                                        <div class="product-badge sale">
+                                                            -<%= Math.round(((shoe.originalPrice - shoe.price) /
+                                                                shoe.originalPrice) * 100) %>%
+                                                        </div>
+                                                        <% } %>
+                                </div>
+                            </div>
+
+                            <div class="product-info">
+                                <div class="product-brand">
+                                    <%= shoe.brand %>
+                                </div>
+                                <h3 class="product-name">
+                                    <a href="/product/<%= shoe.id %>">
+                                        <%= shoe.name %>
+                                    </a>
+                                </h3>
+
+                                <div class="product-rating">
+                                    <div class="stars">
+                                        <% for (let i=1; i <=5; i++) { %>
+                                            <i
+                                                class="fas fa-star <%= i <= Math.floor(shoe.rating) ? 'filled' : '' %>"></i>
+                                            <% } %>
+                                    </div>
+                                    <span class="rating-text">(<%= shoe.reviews %>)</span>
+                                </div>
+
+                                <div class="product-price">
+                                    <span class="current-price">$<%= shoe.price %></span>
+                                    <% if (shoe.originalPrice> shoe.price) { %>
+                                        <span class="original-price">$<%= shoe.originalPrice %></span>
+                                        <% } %>
+                                </div>
+
+                                <div class="product-colors">
+                                    <% shoe.colorCodes.slice(0, 3).forEach(function(color) { %>
+                                        <div class="color-dot" style="background-color: <%= color %>"></div>
+                                        <% }); %>
+                                            <% if (shoe.colors.length> 3) { %>
+                                                <span class="more-colors">+<%= shoe.colors.length - 3 %></span>
+                                                <% } %>
+                                </div>
+
+                                <div class="product-actions">
+                                    <a href="/product/<%= shoe.id %>" class="btn btn-primary btn-small">
+                                        <i class="fas fa-info-circle"></i>
+                                        View Details
+                                    </a>
+                                    <button class="btn btn-icon wishlist-btn" data-product-id="<%= shoe.id %>"
+                                        title="Add to Wishlist">
+                                        <i class="far fa-heart"></i>
+                                    </button>
+                                    <button class="btn btn-icon add-to-cart-btn" data-product-id="<%= shoe.id %>"
+                                        title="Add to Cart">
+                                        <i class="fas fa-shopping-bag"></i>
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                        <% }); %>
+                </div>
+
+                <!-- Pagination -->
+                <% if (totalPages> 1) { %>
+                    <div class="pagination-section" data-aos="fade-up">
+                        <div class="pagination">
+                            <% if (currentPage> 1) { %>
+                                <a href="?page=<%= currentPage - 1 %><%= currentSearch ? '&search=' + encodeURIComponent(currentSearch) : '' %><%= currentCategory !== 'all' ? '&category=' + currentCategory : '' %><%= currentSort !== 'default' ? '&sort=' + currentSort : '' %><%= minPrice ? '&minPrice=' + minPrice : '' %><%= maxPrice ? '&maxPrice=' + maxPrice : '' %><%= currentBrand ? '&brand=' + encodeURIComponent(currentBrand) : '' %>"
+                                    class="pagination-btn">
+                                    <i class="fas fa-chevron-left"></i> Previous
+                                </a>
+                                <% } %>
+
+                                    <% let startPage=Math.max(1, currentPage - 2); let endPage=Math.min(totalPages,
+                                        currentPage + 2); %>
+
+                                        <% if (startPage> 1) { %>
+                                            <a href="?page=1<%= currentSearch ? '&search=' + encodeURIComponent(currentSearch) : '' %><%= currentCategory !== 'all' ? '&category=' + currentCategory : '' %><%= currentSort !== 'default' ? '&sort=' + currentSort : '' %><%= minPrice ? '&minPrice=' + minPrice : '' %><%= maxPrice ? '&maxPrice=' + maxPrice : '' %><%= currentBrand ? '&brand=' + encodeURIComponent(currentBrand) : '' %>"
+                                                class="pagination-btn">1</a>
+                                            <% if (startPage> 2) { %>
+                                                <span class="pagination-dots">...</span>
+                                                <% } %>
+                                                    <% } %>
+
+                                                        <% for (let i=startPage; i <=endPage; i++) { %>
+                                                            <a href="?page=<%= i %><%= currentSearch ? '&search=' + encodeURIComponent(currentSearch) : '' %><%= currentCategory !== 'all' ? '&category=' + currentCategory : '' %><%= currentSort !== 'default' ? '&sort=' + currentSort : '' %><%= minPrice ? '&minPrice=' + minPrice : '' %><%= maxPrice ? '&maxPrice=' + maxPrice : '' %><%= currentBrand ? '&brand=' + encodeURIComponent(currentBrand) : '' %>"
+                                                                class="pagination-btn <%= i === currentPage ? 'active' : '' %>">
+                                                                <%= i %>
+                                                            </a>
+                                                            <% } %>
+
+                                                                <% if (endPage < totalPages) { %>
+                                                                    <% if (endPage < totalPages - 1) { %>
+                                                                        <span class="pagination-dots">...</span>
+                                                                        <% } %>
+                                                                            <a href="?page=<%= totalPages %><%= currentSearch ? '&search=' + encodeURIComponent(currentSearch) : '' %><%= currentCategory !== 'all' ? '&category=' + currentCategory : '' %><%= currentSort !== 'default' ? '&sort=' + currentSort : '' %><%= minPrice ? '&minPrice=' + minPrice : '' %><%= maxPrice ? '&maxPrice=' + maxPrice : '' %><%= currentBrand ? '&brand=' + encodeURIComponent(currentBrand) : '' %>"
+                                                                                class="pagination-btn">
+                                                                                <%= totalPages %>
+                                                                            </a>
+                                                                            <% } %>
+
+                                                                                <% if (currentPage < totalPages) { %>
+                                                                                    <a href="?page=<%= currentPage + 1 %><%= currentSearch ? '&search=' + encodeURIComponent(currentSearch) : '' %><%= currentCategory !== 'all' ? '&category=' + currentCategory : '' %><%= currentSort !== 'default' ? '&sort=' + currentSort : '' %><%= minPrice ? '&minPrice=' + minPrice : '' %><%= maxPrice ? '&maxPrice=' + maxPrice : '' %><%= currentBrand ? '&brand=' + encodeURIComponent(currentBrand) : '' %>"
+                                                                                        class="pagination-btn">
+                                                                                        Next <i
+                                                                                            class="fas fa-chevron-right"></i>
+                                                                                    </a>
+                                                                                    <% } %>
+                        </div>
+                    </div>
+                    <% } %>
+            </div>
+        </section>
+
+        <!-- Quick View Modal -->
+        <div class="modal" id="quick-view-modal">
+            <div class="modal-overlay" id="modal-overlay"></div>
+            <div class="modal-content">
+                <button class="modal-close" id="modal-close">
+                    <i class="fas fa-times"></i>
+                </button>
+                <div class="quick-view-content" id="quick-view-content">
+                    <!-- Content will be loaded dynamically -->
+                </div>
+            </div>
+        </div>
+
+        <!-- Footer -->
+        <%- include('partials/footer') %>
+
+            <!-- Scripts -->
+            <script src="https://unpkg.com/aos@2.3.1/dist/aos.js"></script>
+            <script src="/js/main.js"></script>
+            <script src="/js/products.js"></script>
+            <script>
+                // Initialize AOS
+                AOS.init({
+                    duration: 800,
+                    easing: 'ease-in-out',
+                    once: true,
+                    offset: 100
+                });
+
+                // Modal close functionality
+                document.addEventListener('click', (e) => {
+                    const modal = document.getElementById('quick-view-modal');
+
+                    if (e.target.id === 'modal-overlay' || e.target.id === 'modal-close') {
+                        modal.classList.remove('active');
+                        document.body.style.overflow = '';
+                    }
+                });
+
+                // Keyboard navigation for modal
+                document.addEventListener('keydown', (e) => {
+                    const modal = document.getElementById('quick-view-modal');
+
+                    if (e.key === 'Escape' && modal.classList.contains('active')) {
+                        modal.classList.remove('active');
+                        document.body.style.overflow = '';
+                    }
+                });
+
+                // Filter and Sort functionality
+                document.addEventListener('DOMContentLoaded', function () {
+                    // Category filter buttons
+                    document.querySelectorAll('.filter-btn').forEach(btn => {
+                        btn.addEventListener('click', function () {
+                            const category = this.dataset.category;
+                            updateURL({ category: category, page: 1 });
+                        });
+                    });
+
+                    // Sort dropdown
+                    document.getElementById('sort-select').addEventListener('change', function () {
+                        updateURL({ sort: this.value, page: 1 });
+                    });
+
+                    // Brand filter
+                    document.getElementById('brand-select').addEventListener('change', function () {
+                        updateURL({ brand: this.value, page: 1 });
+                    });
+
+                    // Price filter
+                    document.querySelector('.apply-price-btn').addEventListener('click', function () {
+                        const minPrice = document.getElementById('minPrice').value;
+                        const maxPrice = document.getElementById('maxPrice').value;
+                        updateURL({ minPrice: minPrice, maxPrice: maxPrice, page: 1 });
+                    });
+
+                    function updateURL(params) {
+                        const url = new URL(window.location);
+
+                        // Update or remove parameters
+                        Object.keys(params).forEach(key => {
+                            if (params[key] && params[key] !== '' && params[key] !== 'all' && params[key] !== 'default') {
+                                url.searchParams.set(key, params[key]);
+                            } else {
+                                url.searchParams.delete(key);
+                            }
+                        });
+
+                        // Navigate to new URL
+                        window.location.href = url.toString();
+                    }
+                });
+            </script>
+</body>
+
+</html>

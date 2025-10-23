@@ -1,0 +1,69 @@
+<nav class="navbar" id="navbar">
+    <div class="nav-container">
+        <!-- Logo -->
+        <div class="nav-logo">
+            <a href="/">
+                <div class="logo-icon">
+                    <i class="fas fa-shoe-prints"></i>
+                </div>
+                <span class="logo-text">Sneaker<span class="logo-accent">Head</span></span>
+            </a>
+        </div>
+        
+        <!-- Desktop Navigation -->
+        <div class="nav-menu" id="nav-menu">
+            <a href="/" class="nav-link">Home</a>
+            <a href="/products" class="nav-link">Products</a>
+            <a href="/about" class="nav-link">About</a>
+            <a href="/contact" class="nav-link">Contact</a>
+        </div>
+        
+        <!-- Search Bar -->
+        <div class="nav-search">
+            <input type="text" placeholder="Search shoes..." id="search-input" autocomplete="off">
+            <button class="search-btn">
+                <i class="fas fa-search"></i>
+            </button>
+            <div class="search-suggestions" id="search-suggestions"></div>
+        </div>
+        
+        <!-- Action Buttons -->
+        <div class="nav-actions">
+            <button class="nav-btn theme-toggle" id="theme-toggle" title="Toggle Theme">
+                <i class="fas fa-moon"></i>
+            </button>
+            <a href="/wishlist" class="nav-btn wishlist-btn" title="Wishlist">
+                <i class="fas fa-heart"></i>
+                <span class="cart-count" id="wishlist-count">0</span>
+            </a>
+            <a href="/cart" class="nav-btn cart-btn" id="cart-btn" title="Shopping Cart">
+                <i class="fas fa-shopping-bag"></i>
+                <span class="cart-count" id="cart-count">0</span>
+            </a>
+            <button class="nav-btn profile-btn" title="Profile">
+                <i class="fas fa-user"></i>
+            </button>
+        </div>
+        
+        <!-- Mobile Menu Toggle -->
+        <div class="mobile-menu-toggle" id="mobile-menu-toggle">
+            <span></span>
+            <span></span>
+            <span></span>
+        </div>
+    </div>
+    
+    <!-- Mobile Menu -->
+    <div class="mobile-menu" id="mobile-menu">
+        <div class="mobile-menu-content">
+            <a href="/" class="mobile-nav-link">Home</a>
+            <a href="/products" class="mobile-nav-link">Products</a>
+            <a href="/about" class="mobile-nav-link">About</a>
+            <a href="/contact" class="mobile-nav-link">Contact</a>
+            <div class="mobile-search">
+                <input type="text" placeholder="Search shoes...">
+                <button><i class="fas fa-search"></i></button>
+            </div>
+        </div>
+    </div>
+</nav>
