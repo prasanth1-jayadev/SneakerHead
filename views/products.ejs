@@ -268,18 +268,27 @@
             display: flex;
             align-items: center;
             gap: 0.5rem;
+            flex-wrap: wrap;
         }
 
         .price-filter input {
-            width: 80px;
+            width: 90px;
             padding: 0.5rem;
             border: 1px solid rgba(255, 255, 255, 0.2);
             border-radius: 0.25rem;
             background: var(--bg-tertiary);
             color: var(--text-primary);
+            text-align: center;
+            font-size: 0.9rem;
         }
 
-        .apply-price-btn {
+        .price-filter input:focus {
+            border-color: var(--accent-primary);
+            outline: none;
+            box-shadow: 0 0 0 2px rgba(0, 255, 209, 0.1);
+        }
+
+        .apply-price-btn, .clear-price-btn {
             padding: 0.5rem 1rem;
             background: var(--accent-primary);
             color: var(--bg-primary);
@@ -287,6 +296,67 @@
             border-radius: 0.25rem;
             cursor: pointer;
             font-size: 0.8rem;
+            font-weight: 600;
+            transition: all 0.3s ease;
+        }
+
+        .clear-price-btn {
+            background: var(--text-muted);
+            color: var(--text-primary);
+        }
+
+        .apply-price-btn:hover {
+            background: var(--accent-secondary);
+            transform: translateY(-1px);
+        }
+
+        .clear-price-btn:hover {
+            background: var(--error);
+            color: white;
+        }
+
+        .price-range-info {
+            width: 100%;
+            margin-top: 0.5rem;
+        }
+
+        .price-range-info small {
+            color: var(--text-muted);
+            font-size: 0.75rem;
+        }
+
+        .price-presets {
+            display: flex;
+            gap: 0.5rem;
+            margin-top: 0.5rem;
+            flex-wrap: wrap;
+        }
+
+        .preset-btn {
+            padding: 0.25rem 0.5rem;
+            background: transparent;
+            color: var(--text-secondary);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            border-radius: 0.25rem;
+            cursor: pointer;
+            font-size: 0.75rem;
+            transition: all 0.3s ease;
+        }
+
+        .preset-btn:hover {
+            background: var(--accent-primary);
+            color: var(--bg-primary);
+            border-color: var(--accent-primary);
+        }
+
+        .active-filter-indicator {
+            background: var(--accent-primary);
+            color: var(--bg-primary);
+            padding: 0.2rem 0.5rem;
+            border-radius: 0.25rem;
+            font-size: 0.75rem;
+            font-weight: 600;
+            margin-left: 0.5rem;
         }
 
         #brand-select {
@@ -652,6 +722,26 @@
                 grid-template-columns: 1fr;
             }
         }
+
+        /* Sale Badge Styling */
+        .product-badge.sale {
+            background: linear-gradient(135deg, #ff4757 0%, #ff3742 100%);
+            color: white;
+            font-weight: 600;
+            font-size: 0.75rem;
+            padding: 4px 8px;
+            border-radius: 4px;
+            box-shadow: 0 2px 8px rgba(255, 71, 87, 0.3);
+        }
+
+        .product-badge.trending {
+            background: linear-gradient(135deg, #ff6b35 0%, #f7931e 100%);
+        }
+
+        .product-badge.new {
+            background: linear-gradient(135deg, #00ff88 0%, #00cc6a 100%);
+            color: #1a1a1a;
+        }
     </style>
 </head>
 
@@ -714,12 +804,35 @@
 
                             <!-- Price Range Filter -->
                             <div class="filter-group">
-                                <label>Price Range:</label>
+                                <label>Price Range: 
+                                    <% if (minPrice || maxPrice) { %>
+                                        <span class="active-filter-indicator">
+                                            <% if (minPrice && maxPrice) { %>
+                                                $<%= minPrice %> - $<%= maxPrice %>
+                                            <% } else if (minPrice) { %>
+                                                $<%= minPrice %>+
+                                            <% } else { %>
+                                                Under $<%= maxPrice %>
+                                            <% } %>
+                                        </span>
+                                    <% } %>
+                                </label>
                                 <div class="price-filter">
-                                    <input type="number" id="minPrice" placeholder="Min" value="<%= minPrice %>">
+                                    <input type="number" id="minPrice" placeholder="Min ($100)" min="0" max="1000" step="10" value="<%= minPrice %>">
                                     <span>-</span>
-                                    <input type="number" id="maxPrice" placeholder="Max" value="<%= maxPrice %>">
+                                    <input type="number" id="maxPrice" placeholder="Max ($500)" min="0" max="1000" step="10" value="<%= maxPrice %>">
                                     <button class="apply-price-btn">Apply</button>
+                                    <% if (minPrice || maxPrice) { %>
+                                        <button class="clear-price-btn" type="button">Clear</button>
+                                    <% } %>
+                                </div>
+                                <div class="price-range-info">
+                                    <small>Range: $139 - $399</small>
+                                </div>
+                                <div class="price-presets">
+                                    <button class="preset-btn" data-min="0" data-max="200">Under $200</button>
+                                    <button class="preset-btn" data-min="200" data-max="300">$200 - $300</button>
+                                    <button class="preset-btn" data-min="300" data-max="500">$300+</button>
                                 </div>
                             </div>
 
@@ -792,7 +905,7 @@
                                             <% if (shoe.trending) { %>
                                                 <div class="product-badge trending">🔥 Hot</div>
                                                 <% } %>
-                                                    <% if (shoe.originalPrice> shoe.price) { %>
+                                                    <% if (shoe.originalPrice > shoe.price) { %>
                                                         <div class="product-badge sale">
                                                             -<%= Math.round(((shoe.originalPrice - shoe.price) /
                                                                 shoe.originalPrice) * 100) %>%
@@ -823,7 +936,7 @@
 
                                 <div class="product-price">
                                     <span class="current-price">$<%= shoe.price %></span>
-                                    <% if (shoe.originalPrice> shoe.price) { %>
+                                    <% if (shoe.originalPrice > shoe.price) { %>
                                         <span class="original-price">$<%= shoe.originalPrice %></span>
                                         <% } %>
                                 </div>
@@ -832,7 +945,7 @@
                                     <% shoe.colorCodes.slice(0, 3).forEach(function(color) { %>
                                         <div class="color-dot" style="background-color: <%= color %>"></div>
                                         <% }); %>
-                                            <% if (shoe.colors.length> 3) { %>
+                                            <% if (shoe.colors.length > 3) { %>
                                                 <span class="more-colors">+<%= shoe.colors.length - 3 %></span>
                                                 <% } %>
                                 </div>
@@ -981,7 +1094,51 @@
                     document.querySelector('.apply-price-btn').addEventListener('click', function () {
                         const minPrice = document.getElementById('minPrice').value;
                         const maxPrice = document.getElementById('maxPrice').value;
+                        
+                        // Validate price range
+                        if (minPrice && maxPrice && parseInt(minPrice) > parseInt(maxPrice)) {
+                            alert('Minimum price cannot be greater than maximum price');
+                            return;
+                        }
+                        
                         updateURL({ minPrice: minPrice, maxPrice: maxPrice, page: 1 });
+                    });
+
+                    // Clear price filter
+                    const clearPriceBtn = document.querySelector('.clear-price-btn');
+                    if (clearPriceBtn) {
+                        clearPriceBtn.addEventListener('click', function () {
+                            document.getElementById('minPrice').value = '';
+                            document.getElementById('maxPrice').value = '';
+                            updateURL({ minPrice: '', maxPrice: '', page: 1 });
+                        });
+                    }
+
+                    // Allow Enter key to apply price filter
+                    document.getElementById('minPrice').addEventListener('keypress', function(e) {
+                        if (e.key === 'Enter') {
+                            document.querySelector('.apply-price-btn').click();
+                        }
+                    });
+
+                    document.getElementById('maxPrice').addEventListener('keypress', function(e) {
+                        if (e.key === 'Enter') {
+                            document.querySelector('.apply-price-btn').click();
+                        }
+                    });
+
+                    // Price preset buttons
+                    document.querySelectorAll('.preset-btn').forEach(btn => {
+                        btn.addEventListener('click', function() {
+                            const minPrice = this.getAttribute('data-min');
+                            const maxPrice = this.getAttribute('data-max');
+                            
+                            document.getElementById('minPrice').value = minPrice === '0' ? '' : minPrice;
+                            document.getElementById('maxPrice').value = maxPrice === '500' ? '' : maxPrice;
+                            
+                            // Apply the filter immediately
+                            document.querySelector('.apply-price-btn').click();
+                        });
                     });
 
                     function updateURL(params) {
@@ -999,6 +1156,48 @@
                         // Navigate to new URL
                         window.location.href = url.toString();
                     }
+
+                    // Add to Cart functionality
+                    document.querySelectorAll('.add-to-cart-btn').forEach(button => {
+                        button.addEventListener('click', async function(e) {
+                            e.preventDefault();
+                            const productId = this.getAttribute('data-product-id');
+                            
+                            try {
+                                const response = await fetch('/cart/add', {
+                                    method: 'POST',
+                                    headers: {
+                                        'Content-Type': 'application/json'
+                                    },
+                                    body: JSON.stringify({ productId: parseInt(productId), quantity: 1 })
+                                });
+
+                                const data = await response.json();
+                                
+                                if (data.success) {
+                                    // Update cart count in navbar
+                                    const cartCountElement = document.getElementById('cart-count');
+                                    if (cartCountElement) {
+                                        const currentCount = parseInt(cartCountElement.textContent) || 0;
+                                        cartCountElement.textContent = currentCount + 1;
+                                    }
+                                    
+                                    // Show success message
+                                    this.innerHTML = '<i class="fas fa-check"></i>';
+                                    this.style.background = '#00FF88';
+                                    setTimeout(() => {
+                                        this.innerHTML = '<i class="fas fa-shopping-bag"></i>';
+                                        this.style.background = '';
+                                    }, 2000);
+                                } else {
+                                    alert(data.error || 'Failed to add item to cart');
+                                }
+                            } catch (error) {
+                                console.error('Error adding to cart:', error);
+                                alert('An error occurred while adding item to cart');
+                            }
+                        });
+                    });
                 });
             </script>
 </body>

@@ -1,25 +1,31 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title><%= title %></title>
-    
+    <title>
+        <%= title %>
+    </title>
+
     <!-- Fonts -->
-    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
-    
+    <link
+        href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&family=Inter:wght@300;400;500;600&display=swap"
+        rel="stylesheet">
+
     <!-- Icons -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    
+
     <!-- AOS Animation Library -->
     <link href="https://unpkg.com/aos@2.3.1/dist/aos.css" rel="stylesheet">
-    
+
     <!-- Custom CSS -->
     <link rel="stylesheet" href="/css/style.css">
-    
+
     <!-- Favicon -->
     <link rel="icon" type="image/x-icon" href="/images/favicon.ico">
 </head>
+
 <body class="<%= typeof bodyClass !== 'undefined' ? bodyClass : '' %>">
     <!-- Loading Animation -->
     <div id="loading-screen">
@@ -33,56 +39,57 @@
 
     <!-- Navigation -->
     <%- include('partials/navbar') %>
-    
-    <!-- Main Content -->
-    <main>
-        <%- body %>
-    </main>
-    
-    <!-- Footer -->
-    <%- include('partials/footer') %>
-    
-    <!-- WhatsApp Chat Button -->
-    <div class="whatsapp-chat" id="whatsapp-chat">
-        <a href="https://wa.me/1234567890?text=Hey%20I'm%20interested%20in%20your%20shoes!" target="_blank">
-            <i class="fab fa-whatsapp"></i>
-        </a>
-    </div>
-    
-    <!-- Cart Sidebar -->
-    <div class="cart-sidebar" id="cart-sidebar">
-        <div class="cart-header">
-            <h3>Your Cart</h3>
-            <button class="close-cart" id="close-cart">
-                <i class="fas fa-times"></i>
-            </button>
-        </div>
-        <div class="cart-items" id="cart-items">
-            <div class="empty-cart">
-                <i class="fas fa-shopping-bag"></i>
-                <p>Your cart is empty</p>
-                <p class="empty-cart-subtitle">Add some kicks to get started!</p>
+
+        <!-- Main Content -->
+        <main>
+            <%- body %>
+        </main>
+
+        <!-- Footer -->
+        <%- include('partials/footer') %>
+
+            <!-- WhatsApp Chat Button -->
+            <div class="whatsapp-chat" id="whatsapp-chat">
+                <a href="https://wa.me/1234567890?text=Hey%20I'm%20interested%20in%20your%20shoes!" target="_blank">
+                    <i class="fab fa-whatsapp"></i>
+                </a>
             </div>
-        </div>
-        <div class="cart-footer">
-            <div class="cart-total">
-                <span>Total: $<span id="cart-total">0</span></span>
+
+            <!-- Cart Sidebar -->
+            <div class="cart-sidebar" id="cart-sidebar">
+                <div class="cart-header">
+                    <h3>Your Cart</h3>
+                    <button class="close-cart" id="close-cart">
+                        <i class="fas fa-times"></i>
+                    </button>
+                </div>
+                <div class="cart-items" id="cart-items">
+                    <div class="empty-cart">
+                        <i class="fas fa-shopping-bag"></i>
+                        <p>Your cart is empty</p>
+                        <p class="empty-cart-subtitle">Add some kicks to get started!</p>
+                    </div>
+                </div>
+                <div class="cart-footer">
+                    <div class="cart-total">
+                        <span>Total: $<span id="cart-total">0</span></span>
+                    </div>
+                    <button class="checkout-btn">Checkout</button>
+                </div>
             </div>
-            <button class="checkout-btn">Checkout</button>
-        </div>
-    </div>
-    
-    <!-- Cart Overlay -->
-    <div class="cart-overlay" id="cart-overlay"></div>
-    
-    <!-- Scripts -->
-    <script src="https://unpkg.com/aos@2.3.1/dist/aos.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/ScrollTrigger.min.js"></script>
-    <script src="/js/main.js"></script>
-    
-    <% if (typeof pageScript !== 'undefined') { %>
-        <script src="/js/<%= pageScript %>"></script>
-    <% } %>
+
+            <!-- Cart Overlay -->
+            <div class="cart-overlay" id="cart-overlay"></div>
+
+            <!-- Scripts -->
+            <script src="https://unpkg.com/aos@2.3.1/dist/aos.js"></script>
+            <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
+            <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/ScrollTrigger.min.js"></script>
+            <script src="/js/main.js"></script>
+
+            <% if (typeof pageScript !=='undefined' ) { %>
+                <script src="/js/<%= pageScript %>"></script>
+                <% } %>
 </body>
+
 </html>

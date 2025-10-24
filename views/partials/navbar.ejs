@@ -1,50 +1,93 @@
 <nav class="navbar" id="navbar">
     <div class="nav-container">
-        <!-- Logo -->
-        <div class="nav-logo">
-            <a href="/">
-                <div class="logo-icon">
-                    <i class="fas fa-shoe-prints"></i>
-                </div>
-                <span class="logo-text">Sneaker<span class="logo-accent">Head</span></span>
-            </a>
+        <!-- Left Section: Logo -->
+        <div class="nav-left">
+            <div class="nav-logo">
+                <a href="/">
+                    <div class="logo-icon">
+                        <i class="fas fa-shoe-prints"></i>
+                    </div>
+                    <span class="logo-text">Sneaker<span class="logo-accent">Head</span></span>
+                </a>
+            </div>
         </div>
-        
-        <!-- Desktop Navigation -->
-        <div class="nav-menu" id="nav-menu">
-            <a href="/" class="nav-link">Home</a>
-            <a href="/products" class="nav-link">Products</a>
-            <a href="/about" class="nav-link">About</a>
-            <a href="/contact" class="nav-link">Contact</a>
+
+        <!-- Center Section: Navigation & Search -->
+        <div class="nav-center">
+            <!-- Desktop Navigation -->
+            <div class="nav-menu" id="nav-menu">
+                <a href="/" class="nav-link">Home</a>
+                <a href="/products" class="nav-link">Products</a>
+                <a href="/about" class="nav-link">About</a>
+                <a href="/contact" class="nav-link">Contact</a>
+            </div>
+
+            <!-- Search Bar -->
+            <div class="nav-search">
+                <input type="text" placeholder="Search shoes..." id="search-input" autocomplete="off">
+                <button class="search-btn">
+                    <i class="fas fa-search"></i>
+                </button>
+                <div class="search-suggestions" id="search-suggestions"></div>
+            </div>
         </div>
-        
-        <!-- Search Bar -->
-        <div class="nav-search">
-            <input type="text" placeholder="Search shoes..." id="search-input" autocomplete="off">
-            <button class="search-btn">
-                <i class="fas fa-search"></i>
-            </button>
-            <div class="search-suggestions" id="search-suggestions"></div>
+
+        <!-- Right Section: Action Buttons -->
+        <div class="nav-right">
+            <div class="nav-actions">
+                <!-- Theme Toggle -->
+                <button class="nav-btn theme-toggle" id="theme-toggle" title="Toggle Theme">
+                    <i class="fas fa-moon"></i>
+                </button>
+
+                <!-- Wishlist -->
+                <a href="/wishlist" class="nav-btn wishlist-btn" title="Wishlist">
+                    <i class="fas fa-heart"></i>
+                    <span class="cart-count" id="wishlist-count">0</span>
+                </a>
+
+                <!-- Shopping Cart -->
+                <a href="/cart" class="nav-btn cart-btn" id="cart-btn" title="Shopping Cart">
+                    <i class="fas fa-shopping-bag"></i>
+                    <span class="cart-count" id="cart-count"><%= typeof cartCount !== 'undefined' ? cartCount : 0 %></span>
+                </a>
+            </div>
+
+            <!-- User Section -->
+            <div class="nav-user-section">
+                <% if (typeof user !=='undefined' && user) { %>
+                    <!-- Profile Dropdown -->
+                    <div class="nav-dropdown">
+                        <button class="nav-btn profile-btn" title="Profile Menu">
+                            <i class="fas fa-user-circle"></i>
+                            <i class="fas fa-angle-down"></i>
+                        </button>
+                        <div class="dropdown-menu">
+                            <a href="/user/profile" class="dropdown-item">
+                                <i class="fas fa-user"></i> My Profile
+                            </a>
+                            <a href="/user/orders" class="dropdown-item">
+                                <i class="fas fa-shopping-bag"></i> My Orders
+                            </a>
+                            <a href="/user/addresses" class="dropdown-item">
+                                <i class="fas fa-map-marker-alt"></i> My Addresses
+                            </a>
+                        </div>
+                    </div>
+
+                    <!-- Logout Button -->
+                    <a href="/logout" class="nav-btn logout-btn" title="Logout">
+                        <i class="fas fa-sign-out-alt"></i>
+                    </a>
+                    <% } else { %>
+                        <!-- Login Button -->
+                        <a href="/login" class="nav-btn login-btn" title="Login">
+                            <i class="fas fa-sign-in-alt"></i>
+                        </a>
+                        <% } %>
+            </div>
         </div>
-        
-        <!-- Action Buttons -->
-        <div class="nav-actions">
-            <button class="nav-btn theme-toggle" id="theme-toggle" title="Toggle Theme">
-                <i class="fas fa-moon"></i>
-            </button>
-            <a href="/wishlist" class="nav-btn wishlist-btn" title="Wishlist">
-                <i class="fas fa-heart"></i>
-                <span class="cart-count" id="wishlist-count">0</span>
-            </a>
-            <a href="/cart" class="nav-btn cart-btn" id="cart-btn" title="Shopping Cart">
-                <i class="fas fa-shopping-bag"></i>
-                <span class="cart-count" id="cart-count">0</span>
-            </a>
-            <button class="nav-btn profile-btn" title="Profile">
-                <i class="fas fa-user"></i>
-            </button>
-        </div>
-        
+
         <!-- Mobile Menu Toggle -->
         <div class="mobile-menu-toggle" id="mobile-menu-toggle">
             <span></span>
@@ -52,7 +95,7 @@
             <span></span>
         </div>
     </div>
-    
+
     <!-- Mobile Menu -->
     <div class="mobile-menu" id="mobile-menu">
         <div class="mobile-menu-content">
@@ -60,10 +103,893 @@
             <a href="/products" class="mobile-nav-link">Products</a>
             <a href="/about" class="mobile-nav-link">About</a>
             <a href="/contact" class="mobile-nav-link">Contact</a>
-            <div class="mobile-search">
-                <input type="text" placeholder="Search shoes...">
-                <button><i class="fas fa-search"></i></button>
-            </div>
+
+            <% if (typeof user !=='undefined' && user) { %>
+                <div class="mobile-user-section">
+                    <div class="mobile-user-info">
+                        <img src="<%= user.profileImage || '/images/default-avatar.svg' %>" alt="Profile"
+                            class="mobile-avatar">
+                        <span class="mobile-user-name">
+                            <%= user.name %>
+                        </span>
+                    </div>
+                    <a href="/user/profile" class="mobile-nav-link">
+                        <i class="fas fa-user"></i>
+                        Profile
+                    </a>
+                    <a href="/user/orders" class="mobile-nav-link">
+                        <i class="fas fa-shopping-bag"></i> My Orders
+                    </a>
+                    <a href="/user/addresses" class="mobile-nav-link">
+                        <i class="fas fa-map-marker-alt"></i> My Addresses
+                    </a>
+                </div>
+
+                <!-- Separate Logout Section in Mobile -->
+                <div class="mobile-logout-section">
+                    <a href="/logout" class="mobile-nav-link logout-link">
+                        <i class="fas fa-sign-out-alt"></i> Logout
+                    </a>
+                </div>
+                <% } else { %>
+                    <a href="/login" class="mobile-nav-link login-link">
+                        <i class="fas fa-sign-in-alt"></i> Login
+                    </a>
+                    <% } %>
+
+                        <div class="mobile-search">
+                            <input type="text" placeholder="Search shoes...">
+                            <button><i class="fas fa-search"></i></button>
+                        </div>
         </div>
     </div>
 </nav>
+
+<style>
+    /* Main Navbar Styles */
+    .navbar {
+        position: fixed;
+        top: 0;
+        left: 0;
+        right: 0;
+        background: rgba(26, 26, 26, 0.95);
+        backdrop-filter: blur(10px);
+        border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        z-index: 1000;
+        transition: all 0.3s ease;
+    }
+
+    /* Profile Dropdown Styles */
+    .nav-dropdown {
+        position: relative;
+    }
+
+    .fa-user-circle {
+        margin-left: 68px;
+    }
+
+
+
+    .profile-avatar {
+        width: 32px;
+        height: 32px;
+        border-radius: 50%;
+        object-fit: cover;
+        border: 2px solid var(--accent-primary);
+    }
+
+
+
+    .profile-btn i.fa-chevron-down {
+        font-size: 0.75rem;
+        transition: transform 0.3s ease;
+    }
+
+    .nav-dropdown.active .profile-btn i.fa-chevron-down {
+        transform: rotate(180deg);
+    }
+
+    .dropdown-menu {
+        position: absolute;
+        top: calc(100% + 10px);
+        right: 0;
+        background: var(--bg-secondary);
+        border: 1px solid rgba(255, 255, 255, 0.1);
+        border-radius: 12px;
+        padding: 0.75rem 0;
+        min-width: 220px;
+        box-shadow: 0 10px 40px rgba(0, 0, 0, 0.4);
+        opacity: 0;
+        visibility: hidden;
+        transform: translateY(-10px);
+        transition: all 0.3s ease;
+        z-index: 1000;
+        backdrop-filter: blur(10px);
+    }
+
+    .nav-dropdown.active .dropdown-menu {
+        opacity: 1;
+        visibility: visible;
+        transform: translateY(0);
+    }
+
+    .dropdown-item {
+        display: flex;
+        align-items: center;
+        padding: 0.75rem 1.25rem;
+        color: var(--text-secondary);
+        text-decoration: none;
+        transition: all 0.3s ease;
+        font-size: 0.95rem;
+        font-weight: 500;
+        position: relative;
+    }
+
+    .dropdown-item:hover {
+        background: rgba(0, 255, 209, 0.1);
+        color: var(--accent-primary);
+        transform: translateX(5px);
+    }
+
+    .dropdown-item i {
+        width: 20px;
+        min-width: 20px;
+        height: 20px;
+        font-size: 1rem;
+        color: var(--text-muted);
+        transition: color 0.3s ease;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin-right: 1rem;
+    }
+
+    .dropdown-item:hover i {
+        color: var(--accent-primary);
+    }
+
+    .dropdown-divider {
+        height: 1px;
+        background: rgba(255, 255, 255, 0.1);
+        margin: 1rem 0;
+    }
+
+    /* Icon-Only Profile Button */
+    .profile-btn {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 1px;
+        padding: 6px 8px;
+        background: #f8f9fa;
+        border: 1px solid #dee2e6;
+        border-radius: 4px;
+        color: #495057;
+        cursor: pointer;
+        transition: all 0.2s ease;
+        width: 40px;
+        height: 32px;
+    }
+
+    .profile-btn:hover {
+        background: #e9ecef;
+        border-color: #adb5bd;
+    }
+
+    .profile-btn .fa-user-circle {
+        font-size: 14px;
+        color: #6c757d;
+        margin-left: 3px;
+    }
+
+    .profile-btn .fa-angle-down {
+        font-size: 8px;
+        color: #6c757d;
+        transition: transform 0.2s ease;
+    }
+
+    .nav-dropdown.active .profile-btn .fa-angle-down {
+        transform: rotate(180deg);
+    }
+
+    /* Icon-Only Login Button */
+    .login-btn {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        padding: 6px;
+        background: #3b82f6;
+        border: 1px solid #3b82f6;
+        border-radius: 4px;
+        color: #fff;
+        text-decoration: none;
+        transition: all 0.2s ease;
+        width: 32px;
+        height: 32px;
+    }
+
+    .login-btn:hover {
+        background: #2563eb;
+        border-color: #2563eb;
+        color: #fff;
+        text-decoration: none;
+    }
+
+    .login-btn .fa-sign-in-alt {
+        font-size: 14px;
+    }
+
+
+    /* Icon-Only Logout Button */
+    .logout-btn {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        padding: 6px;
+        background: #fff5f5;
+        border: 1px solid #fecaca;
+        border-radius: 4px;
+        color: #dc2626;
+        text-decoration: none;
+        transition: all 0.2s ease;
+        width: 32px;
+        height: 32px;
+    }
+
+    .logout-btn:hover {
+        background: #dc2626;
+        border-color: #dc2626;
+        color: #fff;
+        text-decoration: none;
+    }
+
+    .logout-btn .fa-sign-out-alt {
+        font-size: 14px;
+    }
+
+
+
+
+
+    /* Responsive Design */
+    /* Mobile Responsive */
+    @media (max-width: 767px) {
+        .dropdown-menu {
+            right: -10px;
+            min-width: 200px;
+        }
+
+        .profile-btn {
+            width: 36px;
+            height: 28px;
+            padding: 4px 6px;
+        }
+
+        .logout-btn,
+        .login-btn {
+            width: 28px;
+            height: 28px;
+            padding: 4px;
+        }
+
+        .profile-btn .fa-user-circle {
+            font-size: 12px;
+        }
+
+        .profile-btn .fa-angle-down {
+            font-size: 6px;
+        }
+
+        .logout-btn .fa-sign-out-alt,
+        .login-btn .fa-sign-in-alt {
+            font-size: 12px;
+        }
+    }
+
+    /* Navbar Container Layout */
+    .nav-container {
+        display: grid;
+        grid-template-columns: 1fr 2fr 1fr;
+        align-items: center;
+        gap: 2rem;
+        max-width: 1400px;
+        margin: 0 auto;
+        padding: 0 2rem;
+        height: 80px;
+    }
+
+    /* Left Section */
+    .nav-left {
+        display: flex;
+        justify-content: flex-start;
+    }
+
+    /* Center Section */
+    .nav-center {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 2rem;
+    }
+
+    /* Right Section */
+    .nav-right {
+        display: flex;
+        justify-content: flex-end;
+    }
+
+    /* Nav Actions Container */
+    .nav-actions {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+    }
+
+    /* User Section */
+    .nav-user-section {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        margin-left: 16px;
+        padding-left: 16px;
+        border-left: 1px solid rgba(255, 255, 255, 0.15);
+    }
+
+    /* Animation for dropdown arrow */
+    @keyframes dropdownFadeIn {
+        from {
+            opacity: 0;
+            transform: translateY(-15px) scale(0.95);
+        }
+
+        to {
+            opacity: 1;
+            transform: translateY(0) scale(1);
+        }
+    }
+
+    .nav-dropdown.active .dropdown-menu {
+        animation: dropdownFadeIn 0.3s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+    }
+
+    /* Hamburger Menu Animation */
+    .mobile-menu-toggle {
+        display: none;
+        flex-direction: column;
+        cursor: pointer;
+        padding: 0.5rem;
+        gap: 4px;
+    }
+
+    .mobile-menu-toggle span {
+        width: 25px;
+        height: 3px;
+        background: var(--text-primary);
+        border-radius: 2px;
+        transition: all 0.3s ease;
+    }
+
+    .mobile-menu-toggle.active span:nth-child(1) {
+        transform: rotate(45deg) translate(6px, 6px);
+    }
+
+    .mobile-menu-toggle.active span:nth-child(2) {
+        opacity: 0;
+    }
+
+    .mobile-menu-toggle.active span:nth-child(3) {
+        transform: rotate(-45deg) translate(6px, -6px);
+    }
+
+    @media (max-width: 768px) {
+        .nav-container {
+            grid-template-columns: 1fr auto auto;
+            gap: 1rem;
+            padding: 0 1rem;
+        }
+
+        .nav-center {
+            display: none;
+        }
+
+        .nav-right {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .nav-actions {
+            gap: 6px;
+        }
+
+        .nav-user-section {
+            margin-left: 8px;
+            padding-left: 8px;
+            gap: 6px;
+            border-left: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .mobile-menu-toggle {
+            display: flex;
+            order: 3;
+        }
+
+        .nav-menu,
+        .nav-search {
+            display: none;
+        }
+    }
+
+    /* Prevent body scroll when mobile menu is open */
+    body.mobile-menu-open {
+        overflow: hidden;
+    }
+
+    /* Mobile Menu User Section */
+    .mobile-user-section {
+        border-top: 1px solid rgba(255, 255, 255, 0.1);
+        margin-top: 1rem;
+        padding-top: 1rem;
+    }
+
+    .mobile-user-info {
+        display: flex;
+        align-items: center;
+        gap: 0.75rem;
+        padding: 1rem;
+        background: rgba(0, 255, 209, 0.1);
+        border-radius: 10px;
+        margin-bottom: 1rem;
+    }
+
+    .mobile-avatar {
+        width: 40px;
+        height: 40px;
+        border-radius: 50%;
+        object-fit: cover;
+        border: 2px solid var(--accent-primary);
+    }
+
+    .mobile-user-name {
+        font-weight: 600;
+        color: var(--text-primary);
+    }
+
+    .mobile-nav-link {
+        display: flex;
+        align-items: center;
+        padding: 0.75rem 1rem;
+        color: var(--text-secondary);
+        text-decoration: none;
+        border-radius: 8px;
+        margin-bottom: 0.5rem;
+        transition: all 0.3s ease;
+    }
+
+    .mobile-nav-link:hover {
+        background: rgba(255, 255, 255, 0.1);
+        color: var(--text-primary);
+        transform: translateX(5px);
+    }
+
+    .mobile-nav-link i {
+        width: 24px;
+        min-width: 24px;
+        height: 24px;
+        font-size: 1.1rem;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin-right: 1rem;
+    }
+
+    /* Mobile Logout Section */
+    .mobile-logout-section {
+        border-top: 2px solid rgba(255, 107, 107, 0.3);
+        margin-top: 2rem;
+        padding-top: 1.5rem;
+    }
+
+    /* Standard Mobile Menu Buttons */
+    .mobile-nav-link.logout-link {
+        color: #dc3545;
+        background: #ffffff;
+        border: 1px solid #dc3545;
+        border-radius: 6px;
+        font-weight: 500;
+        justify-content: center;
+        margin-top: 1rem;
+    }
+
+    .mobile-nav-link.logout-link:hover {
+        background: #dc3545;
+        color: #ffffff;
+        transform: translateY(-1px);
+    }
+
+    .mobile-nav-link.login-link {
+        background: #007bff;
+        color: #ffffff;
+        border: 1px solid #007bff;
+        border-radius: 6px;
+        font-weight: 500;
+        justify-content: center;
+        margin-top: 1rem;
+    }
+
+    .mobile-nav-link.login-link:hover {
+        background: #0056b3;
+        border-color: #0056b3;
+        transform: translateY(-1px);
+    }
+
+    /* Enhanced Mobile Menu Styling */
+    .mobile-menu {
+        position: fixed;
+        top: 80px;
+        left: 0;
+        width: 100%;
+        height: calc(100vh - 80px);
+        background: var(--bg-secondary);
+        backdrop-filter: blur(10px);
+        transform: translateX(-100%);
+        transition: transform 0.3s ease;
+        z-index: 999;
+        overflow-y: auto;
+    }
+
+    .mobile-menu.active {
+        transform: translateX(0);
+    }
+
+    .mobile-menu-content {
+        padding: 2rem;
+    }
+
+    .mobile-search {
+        margin-top: 2rem;
+        padding-top: 2rem;
+        border-top: 1px solid rgba(255, 255, 255, 0.1);
+    }
+
+    .mobile-search input {
+        width: 100%;
+        padding: 1rem;
+        background: var(--bg-tertiary);
+        border: 1px solid rgba(255, 255, 255, 0.2);
+        border-radius: 10px;
+        color: var(--text-primary);
+        margin-bottom: 1rem;
+    }
+
+    .mobile-search button {
+        width: 100%;
+        padding: 1rem;
+        background: var(--accent-primary);
+        border: none;
+        border-radius: 10px;
+        color: var(--bg-primary);
+        font-weight: 600;
+        cursor: pointer;
+        transition: all 0.3s ease;
+    }
+
+    .mobile-search button:hover {
+        background: var(--accent-secondary);
+        transform: translateY(-2px);
+    }
+
+    /* Logo Styling - Horizontal Layout */
+    .nav-logo {
+        display: flex;
+        align-items: center;
+    }
+
+    .nav-logo a {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        text-decoration: none;
+        transition: all 0.3s ease;
+    }
+
+    .nav-logo a:hover {
+        transform: translateY(-1px);
+    }
+
+    .logo-icon {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        transition: all 0.3s ease;
+    }
+
+    .logo-icon:hover {
+        transform: scale(1.1);
+    }
+
+    .logo-icon i {
+        font-size: 24px;
+        color: #00ff88;
+        transform: rotate(-15deg);
+        transition: all 0.3s ease;
+    }
+
+    .logo-icon:hover i {
+        color: #00FFD1;
+        transform: rotate(-15deg) scale(1.1);
+    }
+
+    .logo-text {
+        background: linear-gradient(135deg, #ffffff 0%, #00FFD1 50%, #FF5F1F 100%);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        background-clip: text;
+        font-weight: 900;
+        letter-spacing: -0.5px;
+        text-transform: uppercase;
+        font-size: 24px;
+        line-height: 1;
+    }
+
+    .logo-accent {
+        background: linear-gradient(135deg, #00FFD1 0%, #FF5F1F 100%);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        background-clip: text;
+        font-weight: 900;
+    }
+
+    /* Search Suggestions */
+    .nav-search {
+        position: relative;
+    }
+
+    .search-suggestions {
+        position: absolute;
+        top: calc(100% + 8px);
+        left: 0;
+        right: 0;
+        background: var(--bg-secondary);
+        border: 1px solid rgba(255, 255, 255, 0.1);
+        border-radius: 8px;
+        box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+        backdrop-filter: blur(10px);
+        z-index: 1000;
+        display: none;
+        overflow: hidden;
+    }
+
+    .suggestion-item {
+        display: flex;
+        align-items: center;
+        gap: 0.75rem;
+        padding: 0.75rem 1rem;
+        color: var(--text-secondary);
+        cursor: pointer;
+        transition: all 0.3s ease;
+        border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+    }
+
+    .suggestion-item:last-child {
+        border-bottom: none;
+    }
+
+    .suggestion-item:hover {
+        background: rgba(0, 255, 209, 0.1);
+        color: var(--accent-primary);
+    }
+
+    .suggestion-item i {
+        color: var(--text-muted);
+        font-size: 0.9rem;
+    }
+
+    .suggestion-item:hover i {
+        color: var(--accent-primary);
+    }
+
+    /* Search Input Styles */
+    .nav-search input {
+        width: 300px;
+        padding: 0.75rem 1rem;
+        background: rgba(255, 255, 255, 0.1);
+        border: 1px solid rgba(255, 255, 255, 0.2);
+        border-radius: 25px;
+        color: var(--text-primary);
+        font-size: 0.95rem;
+        transition: all 0.3s ease;
+        outline: none;
+    }
+
+    .nav-search input:focus {
+        background: rgba(255, 255, 255, 0.15);
+        border-color: var(--accent-primary);
+        box-shadow: 0 0 0 3px rgba(0, 255, 209, 0.1);
+    }
+
+    .nav-search input::placeholder {
+        color: var(--text-muted);
+    }
+
+    .search-btn {
+        position: absolute;
+        right: 8px;
+        top: 50%;
+        transform: translateY(-50%);
+        background: var(--accent-primary);
+        border: none;
+        border-radius: 50%;
+        width: 32px;
+        height: 32px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        color: var(--bg-primary);
+    }
+
+    .search-btn:hover {
+        background: var(--accent-secondary);
+        transform: translateY(-50%) scale(1.05);
+    }
+
+    .search-btn i {
+        font-size: 0.9rem;
+    }
+
+    /* Mobile Logo */
+    @media (max-width: 768px) {
+        .nav-logo a {
+            gap: 8px;
+        }
+
+        .logo-icon i {
+            font-size: 20px;
+        }
+
+        .logo-text {
+            font-size: 18px;
+        }
+
+        .nav-search input {
+            width: 250px;
+        }
+    }
+
+    @media (max-width: 480px) {
+        .logo-text {
+            font-size: 16px;
+        }
+
+        .logo-icon i {
+            font-size: 18px;
+        }
+
+        .nav-search input {
+            width: 200px;
+        }
+    }
+</style>
+
+<script>
+    // Profile dropdown functionality
+    document.addEventListener('DOMContentLoaded', function () {
+        const profileBtn = document.querySelector('.profile-btn');
+        const dropdown = document.querySelector('.nav-dropdown');
+
+        if (profileBtn && dropdown) {
+            profileBtn.addEventListener('click', function (e) {
+                e.preventDefault();
+                e.stopPropagation();
+                dropdown.classList.toggle('active');
+            });
+
+            // Close dropdown when clicking outside
+            document.addEventListener('click', function (e) {
+                if (!e.target.closest('.nav-dropdown')) {
+                    dropdown.classList.remove('active');
+                }
+            });
+        }
+
+        // Search functionality
+        const searchInput = document.getElementById('search-input');
+        const searchBtn = document.querySelector('.search-btn');
+        const searchSuggestions = document.getElementById('search-suggestions');
+        const mobileSearchInput = document.querySelector('.mobile-search input');
+        const mobileSearchBtn = document.querySelector('.mobile-search button');
+
+        // Desktop search
+        if (searchInput && searchBtn) {
+            // Handle search button click
+            searchBtn.addEventListener('click', function (e) {
+                e.preventDefault();
+                performSearch(searchInput.value.trim());
+            });
+
+            // Handle Enter key press
+            searchInput.addEventListener('keypress', function (e) {
+                if (e.key === 'Enter') {
+                    e.preventDefault();
+                    performSearch(this.value.trim());
+                }
+            });
+
+            // Handle input for suggestions
+            searchInput.addEventListener('input', function () {
+                const query = this.value.trim();
+                if (query.length > 2) {
+                    showSearchSuggestions(query);
+                } else {
+                    hideSearchSuggestions();
+                }
+            });
+
+            // Hide suggestions when clicking outside
+            document.addEventListener('click', function (e) {
+                if (!e.target.closest('.nav-search')) {
+                    hideSearchSuggestions();
+                }
+            });
+        }
+
+        // Mobile search
+        if (mobileSearchInput && mobileSearchBtn) {
+            mobileSearchBtn.addEventListener('click', function (e) {
+                e.preventDefault();
+                performSearch(mobileSearchInput.value.trim());
+            });
+
+            mobileSearchInput.addEventListener('keypress', function (e) {
+                if (e.key === 'Enter') {
+                    e.preventDefault();
+                    performSearch(this.value.trim());
+                }
+            });
+        }
+
+        // Perform search function
+        function performSearch(query) {
+            if (query) {
+                window.location.href = `/search?q=${encodeURIComponent(query)}`;
+            }
+        }
+
+        // Show search suggestions
+        function showSearchSuggestions(query) {
+            // You can implement AJAX call here to get suggestions
+            // For now, we'll just show the suggestions container
+            if (searchSuggestions) {
+                searchSuggestions.style.display = 'block';
+                // Add some basic suggestions
+                searchSuggestions.innerHTML = `
+                    <div class="suggestion-item" onclick="performSearch('${query}')">
+                        <i class="fas fa-search"></i>
+                        Search for "${query}"
+                    </div>
+                `;
+            }
+        }
+
+        // Hide search suggestions
+        function hideSearchSuggestions() {
+            if (searchSuggestions) {
+                searchSuggestions.style.display = 'none';
+            }
+        }
+
+        // Mobile menu toggle
+        const mobileMenuToggle = document.getElementById('mobile-menu-toggle');
+        const mobileMenu = document.getElementById('mobile-menu');
+
+        if (mobileMenuToggle && mobileMenu) {
+            mobileMenuToggle.addEventListener('click', function () {
+                this.classList.toggle('active');
+                mobileMenu.classList.toggle('active');
+                document.body.classList.toggle('mobile-menu-open');
+            });
+        }
+    });
+</script>

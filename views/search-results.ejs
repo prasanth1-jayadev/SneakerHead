@@ -127,6 +127,168 @@
                 white-space: nowrap;
             }
         }
+
+        /* Compact Search Results Layout */
+        .search-results-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+            gap: 1rem;
+            margin-bottom: 3rem;
+        }
+
+        .search-product-card {
+            background: var(--bg-secondary);
+            border-radius: 12px;
+            overflow: hidden;
+            transition: all 0.3s ease;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            position: relative;
+            height: 280px;
+        }
+
+        .search-product-card:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 10px 30px rgba(0, 255, 209, 0.2);
+            border-color: var(--accent-primary);
+        }
+
+        .search-product-card .product-image-container {
+            position: relative;
+            height: 160px;
+            overflow: hidden;
+        }
+
+        .search-product-card .product-image {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            transition: transform 0.3s ease;
+        }
+
+        .search-product-card:hover .product-image {
+            transform: scale(1.05);
+        }
+
+        .search-product-card .product-info {
+            padding: 1rem;
+            height: 120px;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+        }
+
+        .search-product-card .product-brand {
+            font-size: 0.75rem;
+            color: var(--text-muted);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            margin-bottom: 0.25rem;
+        }
+
+        .search-product-card .product-name {
+            font-size: 0.9rem;
+            font-weight: 600;
+            color: var(--text-primary);
+            margin-bottom: 0.5rem;
+            line-height: 1.2;
+            display: -webkit-box;
+            -webkit-line-clamp: 2;
+            -webkit-box-orient: vertical;
+            overflow: hidden;
+        }
+
+        .search-product-card .product-price {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .search-product-card .current-price {
+            font-size: 1rem;
+            font-weight: 700;
+            color: var(--accent-primary);
+        }
+
+        .search-product-card .original-price {
+            font-size: 0.8rem;
+            color: var(--text-muted);
+            text-decoration: line-through;
+        }
+
+        .search-product-card .product-rating {
+            display: flex;
+            align-items: center;
+            gap: 0.25rem;
+            font-size: 0.75rem;
+        }
+
+        .search-product-card .stars {
+            color: #ffd700;
+        }
+
+        .search-product-card .rating-count {
+            color: var(--text-muted);
+        }
+
+        /* Compact badges for search results */
+        .search-product-card .product-badge {
+            position: absolute;
+            top: 8px;
+            right: 8px;
+            font-size: 0.65rem;
+            padding: 2px 6px;
+            border-radius: 3px;
+        }
+
+        /* Mobile search results */
+        @media (max-width: 768px) {
+            .search-results-grid {
+                grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
+                gap: 0.75rem;
+            }
+
+            .search-product-card {
+                height: 240px;
+            }
+
+            .search-product-card .product-image-container {
+                height: 130px;
+            }
+
+            .search-product-card .product-info {
+                padding: 0.75rem;
+                height: 110px;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .search-results-grid {
+                grid-template-columns: repeat(2, 1fr);
+                gap: 0.5rem;
+            }
+
+            .search-product-card {
+                height: 220px;
+            }
+
+            .search-product-card .product-image-container {
+                height: 120px;
+            }
+
+            .search-product-card .product-info {
+                padding: 0.5rem;
+                height: 100px;
+            }
+
+            .search-product-card .product-name {
+                font-size: 0.8rem;
+            }
+
+            .search-product-card .current-price {
+                font-size: 0.9rem;
+            }
+        }
     </style>
 </head>
 <body>
@@ -153,9 +315,9 @@
                 </div>
                 
                 <!-- Search Results Grid -->
-                <div class="product-grid" data-aos="fade-up" data-aos-delay="400">
+                <div class="search-results-grid" data-aos="fade-up" data-aos-delay="400">
                     <% results.forEach((shoe, index) => { %>
-                        <div class="product-card" data-aos="fade-up" data-aos-delay="<%= index * 50 %>" data-category="<%= shoe.category.toLowerCase() %>">
+                        <div class="search-product-card" data-aos="fade-up" data-aos-delay="<%= index * 50 %>" data-category="<%= shoe.category.toLowerCase() %>">
                             <div class="product-image-container">
                                 <img src="<%= shoe.image %>" alt="<%= shoe.name %>" class="product-image" loading="lazy">
                                 
@@ -296,6 +458,48 @@
                 window.location.href = `/search?q=${encodeURIComponent(term)}`;
             }
         }
+
+        // Add to Cart functionality
+        document.querySelectorAll('.add-to-cart-btn').forEach(button => {
+            button.addEventListener('click', async function(e) {
+                e.preventDefault();
+                const productId = this.getAttribute('data-product-id');
+                
+                try {
+                    const response = await fetch('/cart/add', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json'
+                        },
+                        body: JSON.stringify({ productId: parseInt(productId), quantity: 1 })
+                    });
+
+                    const data = await response.json();
+                    
+                    if (data.success) {
+                        // Update cart count in navbar
+                        const cartCountElement = document.getElementById('cart-count');
+                        if (cartCountElement) {
+                            const currentCount = parseInt(cartCountElement.textContent) || 0;
+                            cartCountElement.textContent = currentCount + 1;
+                        }
+                        
+                        // Show success message
+                        this.innerHTML = '<i class="fas fa-check"></i>';
+                        this.style.background = '#00FF88';
+                        setTimeout(() => {
+                            this.innerHTML = '<i class="fas fa-shopping-bag"></i>';
+                            this.style.background = '';
+                        }, 2000);
+                    } else {
+                        alert(data.error || 'Failed to add item to cart');
+                    }
+                } catch (error) {
+                    console.error('Error adding to cart:', error);
+                    alert('An error occurred while adding item to cart');
+                }
+            });
+        });
     </script>
 </body>
 </html>

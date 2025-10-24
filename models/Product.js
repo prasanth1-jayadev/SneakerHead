@@ -137,11 +137,11 @@ class Product {
                 colors: ["Core Black", "Cloud White", "Solar Red"],
                 colorCodes: ["#000000", "#FFFFFF", "#FF4500"],
                 sizes: [7, 8, 9, 10, 11, 12],
-                image: "https://images.unsplash.com/photo-1608231387042-66d1773070a5?auto=format&fit=crop&w=600&q=80",
+                image: "https://images.unsplash.com/photo-1542291026-7eec264c27ff?auto=format&fit=crop&w=600&q=80",
                 images: [
-                    "https://images.unsplash.com/photo-1608231387042-66d1773070a5?auto=format&fit=crop&w=600&q=80",
-                    "https://images.unsplash.com/photo-1606890737304-57a1ca8a5b62?auto=format&fit=crop&w=600&q=80",
-                    "https://images.unsplash.com/photo-1571019613454-1cb2f99b2d8b?auto=format&fit=crop&w=600&q=80"
+                    "https://images.unsplash.com/photo-1542291026-7eec264c27ff?auto=format&fit=crop&w=600&q=80",
+                    "https://images.unsplash.com/photo-1549298916-b41d501d3772?auto=format&fit=crop&w=600&q=80",
+                    "https://images.unsplash.com/photo-1560769629-975ec94e6a86?auto=format&fit=crop&w=600&q=80"
                 ],
                 description: "Experience endless energy return with revolutionary Boost technology. Perfect for long runs and daily training.",
                 features: ["Boost Midsole", "Primeknit Upper", "Continental Rubber", "Torsion System"],

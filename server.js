@@ -6,6 +6,18 @@ const bcrypt = require('bcrypt');
 const multer = require('multer');
 const fs = require('fs');
 
+// Import models and database
+const User = require('./models/User');
+const database = require('./config/database');
+
+// Helper function to get cart count
+function getCartCount(req) {
+    if (!req.session.cart) {
+        return 0;
+    }
+    return req.session.cart.reduce((total, item) => total + item.quantity, 0);
+}
+
 const app = express();
 const PORT = process.env.PORT || 3001;
 
@@ -145,11 +157,11 @@ const shoes = [
         colors: ["Core Black", "Cloud White", "Solar Red"],
         colorCodes: ["#000000", "#FFFFFF", "#FF4500"],
         sizes: [7, 8, 9, 10, 11, 12],
-        image: "https://images.unsplash.com/photo-1608231387042-66d1773070a5?auto=format&fit=crop&w=600&q=80",
+        image: "https://images.unsplash.com/photo-1542291026-7eec264c27ff?auto=format&fit=crop&w=600&q=80",
         images: [
-            "https://images.unsplash.com/photo-1608231387042-66d1773070a5?auto=format&fit=crop&w=600&q=80",
-            "https://images.unsplash.com/photo-1606890737304-57a1ca8a5b62?auto=format&fit=crop&w=600&q=80",
-            "https://images.unsplash.com/photo-1571019613454-1cb2f99b2d8b?auto=format&fit=crop&w=600&q=80"
+            "https://images.unsplash.com/photo-1542291026-7eec264c27ff?auto=format&fit=crop&w=600&q=80",
+            "https://images.unsplash.com/photo-1549298916-b41d501d3772?auto=format&fit=crop&w=600&q=80",
+            "https://images.unsplash.com/photo-1560769629-975ec94e6a86?auto=format&fit=crop&w=600&q=80"
         ],
         description: "Experience endless energy return with revolutionary Boost technology. Perfect for long runs and daily training.",
         features: ["Boost Midsole", "Primeknit Upper", "Continental Rubber", "Torsion System"],
@@ -330,16 +342,16 @@ app.get('/admin/login', (req, res) => {
 app.post('/admin/login', async (req, res) => {
     const { email, password } = req.body;
     const user = users.find(u => u.email === email && u.isAdmin);
-    
+
     if (user && password === 'admin123') { // Simple password check for demo
         req.session.user = user;
         user.lastLogin = new Date();
         return res.redirect('/admin/dashboard');
     }
-    
-    res.render('admin/login', { 
-        title: 'Admin Login - Sneaker Head', 
-        error: 'Invalid credentials' 
+
+    res.render('admin/login', {
+        title: 'Admin Login - Sneaker Head',
+        error: 'Invalid credentials'
     });
 });
 
@@ -352,8 +364,8 @@ app.get('/admin/dashboard', requireAdmin, (req, res) => {
         totalCategories: categories.length,
         activeCategories: categories.filter(c => c.isActive).length
     };
-    
-    res.render('admin/dashboard', { 
+
+    res.render('admin/dashboard', {
         title: 'Admin Dashboard - Sneaker Head',
         user: req.session.user,
         stats
@@ -366,23 +378,23 @@ app.get('/admin/users', requireAdmin, (req, res) => {
     const limit = 10;
     const search = req.query.search || '';
     const offset = (page - 1) * limit;
-    
+
     let filteredUsers = users.filter(u => !u.isAdmin);
-    
+
     if (search) {
-        filteredUsers = filteredUsers.filter(u => 
+        filteredUsers = filteredUsers.filter(u =>
             u.name.toLowerCase().includes(search.toLowerCase()) ||
             u.email.toLowerCase().includes(search.toLowerCase())
         );
     }
-    
+
     // Sort by latest first
     filteredUsers.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
-    
+
     const totalUsers = filteredUsers.length;
     const totalPages = Math.ceil(totalUsers / limit);
     const paginatedUsers = filteredUsers.slice(offset, offset + limit);
-    
+
     res.render('admin/users', {
         title: 'User Management - Sneaker Head',
         user: req.session.user,
@@ -397,12 +409,12 @@ app.get('/admin/users', requireAdmin, (req, res) => {
 app.post('/admin/users/:id/toggle-status', requireAdmin, (req, res) => {
     const userId = parseInt(req.params.id);
     const user = users.find(u => u.id === userId);
-    
+
     if (user) {
         user.isActive = !user.isActive;
         user.updatedAt = new Date();
     }
-    
+
     res.json({ success: true, isActive: user.isActive });
 });
 
@@ -412,23 +424,23 @@ app.get('/admin/categories', requireAdmin, (req, res) => {
     const limit = 10;
     const search = req.query.search || '';
     const offset = (page - 1) * limit;
-    
+
     let filteredCategories = [...categories];
-    
+
     if (search) {
-        filteredCategories = filteredCategories.filter(c => 
+        filteredCategories = filteredCategories.filter(c =>
             c.name.toLowerCase().includes(search.toLowerCase()) ||
             c.description.toLowerCase().includes(search.toLowerCase())
         );
     }
-    
+
     // Sort by latest first
     filteredCategories.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
-    
+
     const totalCategories = filteredCategories.length;
     const totalPages = Math.ceil(totalCategories / limit);
     const paginatedCategories = filteredCategories.slice(offset, offset + limit);
-    
+
     res.render('admin/categories', {
         title: 'Category Management - Sneaker Head',
         user: req.session.user,
@@ -450,7 +462,7 @@ app.post('/admin/categories', requireAdmin, (req, res) => {
         createdAt: new Date(),
         updatedAt: new Date()
     };
-    
+
     categories.push(newCategory);
     res.redirect('/admin/categories');
 });
@@ -459,25 +471,25 @@ app.post('/admin/categories/:id/edit', requireAdmin, (req, res) => {
     const categoryId = parseInt(req.params.id);
     const { name, description } = req.body;
     const category = categories.find(c => c.id === categoryId);
-    
+
     if (category) {
         category.name = name;
         category.description = description;
         category.updatedAt = new Date();
     }
-    
+
     res.redirect('/admin/categories');
 });
 
 app.post('/admin/categories/:id/delete', requireAdmin, (req, res) => {
     const categoryId = parseInt(req.params.id);
     const category = categories.find(c => c.id === categoryId);
-    
+
     if (category) {
         category.isActive = false;
         category.updatedAt = new Date();
     }
-    
+
     res.json({ success: true });
 });
 
@@ -487,24 +499,24 @@ app.get('/admin/products', requireAdmin, (req, res) => {
     const limit = 10;
     const search = req.query.search || '';
     const offset = (page - 1) * limit;
-    
+
     let filteredProducts = [...shoes];
-    
+
     if (search) {
-        filteredProducts = filteredProducts.filter(p => 
+        filteredProducts = filteredProducts.filter(p =>
             p.name.toLowerCase().includes(search.toLowerCase()) ||
             p.brand.toLowerCase().includes(search.toLowerCase()) ||
             p.category.toLowerCase().includes(search.toLowerCase())
         );
     }
-    
+
     // Sort by latest first
     filteredProducts.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
-    
+
     const totalProducts = filteredProducts.length;
     const totalPages = Math.ceil(totalProducts / limit);
     const paginatedProducts = filteredProducts.slice(offset, offset + limit);
-    
+
     res.render('admin/products', {
         title: 'Product Management - Sneaker Head',
         user: req.session.user,
@@ -520,12 +532,12 @@ app.get('/admin/products', requireAdmin, (req, res) => {
 app.post('/admin/products/:id/toggle-status', requireAdmin, (req, res) => {
     const productId = parseInt(req.params.id);
     const product = shoes.find(p => p.id === productId);
-    
+
     if (product) {
         product.isActive = !product.isActive;
         product.updatedAt = new Date();
     }
-    
+
     res.json({ success: true, isActive: product.isActive });
 });
 
@@ -538,12 +550,13 @@ app.get('/', (req, res) => {
     const activeShoes = shoes.filter(shoe => shoe.isActive);
     const trendingShoes = activeShoes.filter(shoe => shoe.trending);
     const newShoes = activeShoes.filter(shoe => shoe.new);
-    
-    res.render('index', { 
-        shoes: activeShoes.slice(0, 4), 
-        trendingShoes, 
+
+    res.render('index', {
+        shoes: activeShoes.slice(0, 4),
+        trendingShoes,
         newShoes,
         user: req.session.user || null,
+        cartCount: getCartCount(req),
         title: 'Sneaker Head - Step Into the Future'
     });
 });
@@ -554,19 +567,38 @@ app.get('/login', (req, res) => {
 });
 
 app.post('/login', async (req, res) => {
-    const { email, password } = req.body;
-    const user = users.find(u => u.email === email && !u.isAdmin);
-    
-    if (user && user.isActive && password === 'user123') { // Simple password check for demo
-        req.session.user = user;
-        user.lastLogin = new Date();
-        return res.redirect('/');
+    try {
+        const { email, password } = req.body;
+
+        // Validate input
+        if (!email || !password) {
+            return res.render('auth/login', {
+                title: 'Login - Sneaker Head',
+                error: 'Email and password are required'
+            });
+        }
+
+        // Authenticate user using User model
+        const result = await User.authenticate(email, password);
+
+        if (result.success) {
+            // Store user in session
+            req.session.user = result.user;
+            console.log('✅ User logged in:', result.user.email);
+            res.redirect('/');
+        } else {
+            return res.render('auth/login', {
+                title: 'Login - Sneaker Head',
+                error: result.message
+            });
+        }
+    } catch (error) {
+        console.error('❌ Login error:', error);
+        return res.render('auth/login', {
+            title: 'Login - Sneaker Head',
+            error: 'Login failed. Please try again.'
+        });
     }
-    
-    res.render('auth/login', { 
-        title: 'Login - Sneaker Head', 
-        error: 'Invalid credentials or account blocked' 
-    });
 });
 
 app.get('/signup', (req, res) => {
@@ -574,30 +606,47 @@ app.get('/signup', (req, res) => {
 });
 
 app.post('/signup', async (req, res) => {
-    const { name, email, password, phone } = req.body;
-    
-    // Check if user already exists
-    if (users.find(u => u.email === email)) {
-        return res.render('auth/signup', { 
-            title: 'Sign Up - Sneaker Head', 
-            error: 'Email already registered' 
+    try {
+        const { name, email, password, phone } = req.body;
+
+        // Validate input
+        if (!name || !email || !password) {
+            return res.render('auth/signup', {
+                title: 'Sign Up - Sneaker Head',
+                error: 'Name, email, and password are required'
+            });
+        }
+
+        // Register user using User model
+        const result = await User.register({
+            name: name.trim(),
+            email: email.toLowerCase().trim(),
+            password: password,
+            phone: phone ? phone.trim() : ''
+        }, {
+            source: 'web',
+            ip: req.ip,
+            userAgent: req.get('User-Agent')
+        });
+
+        if (result.success) {
+            // Store user in session
+            req.session.user = result.user;
+            console.log('✅ User registered and logged in:', result.user.email);
+            res.redirect('/');
+        } else {
+            return res.render('auth/signup', {
+                title: 'Sign Up - Sneaker Head',
+                error: result.message
+            });
+        }
+    } catch (error) {
+        console.error('❌ Signup error:', error);
+        return res.render('auth/signup', {
+            title: 'Sign Up - Sneaker Head',
+            error: 'Registration failed. Please try again.'
         });
     }
-    
-    const newUser = {
-        id: Math.max(...users.map(u => u.id)) + 1,
-        name,
-        email,
-        password: password, // In production, hash this
-        phone,
-        isActive: true,
-        isAdmin: false,
-        createdAt: new Date(),
-        updatedAt: new Date(),
-        lastLogin: new Date()
-    };
-    
-    users.push(newUser);
     req.session.user = newUser;
     res.redirect('/');
 });
@@ -607,59 +656,51 @@ app.get('/logout', (req, res) => {
     res.redirect('/');
 });
 
-app.get('/', (req, res) => {
-    const activeShoes = shoes.filter(shoe => shoe.isActive);
-    const trendingShoes = activeShoes.filter(shoe => shoe.trending);
-    const newShoes = activeShoes.filter(shoe => shoe.new);
-    
-    res.render('index', { 
-        shoes: activeShoes.slice(0, 4), 
-        trendingShoes, 
-        newShoes,
-        user: req.session.user || null,
-        title: 'Sneaker Head - Step Into the Future'
-    });
-});
-
 app.get('/products', (req, res) => {
     const { category, sort, search, page = 1, minPrice, maxPrice, brand } = req.query;
     const limit = 12;
     const offset = (page - 1) * limit;
-    
+
     // Filter only active products
     let filteredShoes = shoes.filter(shoe => shoe.isActive);
-    
+
     // Search filter
     if (search) {
-        filteredShoes = filteredShoes.filter(shoe => 
+        filteredShoes = filteredShoes.filter(shoe =>
             shoe.name.toLowerCase().includes(search.toLowerCase()) ||
             shoe.brand.toLowerCase().includes(search.toLowerCase()) ||
             shoe.description.toLowerCase().includes(search.toLowerCase())
         );
     }
-    
+
     // Category filter
     if (category && category !== 'all') {
-        filteredShoes = filteredShoes.filter(shoe => 
+        filteredShoes = filteredShoes.filter(shoe =>
             shoe.category.toLowerCase() === category.toLowerCase()
         );
     }
-    
+
     // Price range filter
-    if (minPrice) {
-        filteredShoes = filteredShoes.filter(shoe => shoe.price >= parseInt(minPrice));
+    if (minPrice && !isNaN(parseInt(minPrice))) {
+        const minPriceNum = parseInt(minPrice);
+        if (minPriceNum >= 0) {
+            filteredShoes = filteredShoes.filter(shoe => shoe.price >= minPriceNum);
+        }
     }
-    if (maxPrice) {
-        filteredShoes = filteredShoes.filter(shoe => shoe.price <= parseInt(maxPrice));
+    if (maxPrice && !isNaN(parseInt(maxPrice))) {
+        const maxPriceNum = parseInt(maxPrice);
+        if (maxPriceNum >= 0) {
+            filteredShoes = filteredShoes.filter(shoe => shoe.price <= maxPriceNum);
+        }
     }
-    
+
     // Brand filter
     if (brand) {
-        filteredShoes = filteredShoes.filter(shoe => 
+        filteredShoes = filteredShoes.filter(shoe =>
             shoe.brand.toLowerCase() === brand.toLowerCase()
         );
     }
-    
+
     // Sorting
     if (sort === 'price-low') {
         filteredShoes.sort((a, b) => a.price - b.price);
@@ -674,15 +715,15 @@ app.get('/products', (req, res) => {
     } else if (sort === 'new-arrivals') {
         filteredShoes.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
     }
-    
+
     const totalProducts = filteredShoes.length;
     const totalPages = Math.ceil(totalProducts / limit);
     const paginatedShoes = filteredShoes.slice(offset, offset + limit);
-    
+
     // Get unique brands for filter
     const brands = [...new Set(shoes.filter(s => s.isActive).map(s => s.brand))];
-    
-    res.render('products', { 
+
+    res.render('products', {
         shoes: paginatedShoes,
         brands,
         currentCategory: category || 'all',
@@ -694,64 +735,246 @@ app.get('/products', (req, res) => {
         minPrice: minPrice || '',
         maxPrice: maxPrice || '',
         currentBrand: brand || '',
+        cartCount: getCartCount(req),
+        user: req.session.user || null,
         title: 'Products - Sneaker Head'
     });
 });
 
 app.get('/product/:id', (req, res) => {
     const shoe = shoes.find(s => s.id === parseInt(req.params.id));
-    
+
     // Redirect if product is blocked/inactive
     if (!shoe || !shoe.isActive) {
         return res.redirect('/products?error=product-unavailable');
     }
-    
+
     const relatedShoes = shoes
         .filter(s => s.id !== shoe.id && s.category === shoe.category && s.isActive)
         .slice(0, 4);
-    
-    res.render('product-detail', { 
-        shoe, 
+
+    res.render('product-detail', {
+        shoe,
         relatedShoes,
+        user: req.session.user || null,
+        cartCount: getCartCount(req),
         title: `${shoe.name} - Sneaker Head`
     });
 });
 
 app.get('/about', (req, res) => {
-    res.render('about', { title: 'About Us - Sneaker Head' });
+    res.render('about', { 
+        title: 'About Us - Sneaker Head',
+        user: req.session.user || null,
+        cartCount: getCartCount(req)
+    });
 });
 
 app.get('/contact', (req, res) => {
-    res.render('contact', { title: 'Contact Us - Sneaker Head' });
+    res.render('contact', { 
+        title: 'Contact Us - Sneaker Head',
+        user: req.session.user || null,
+        cartCount: getCartCount(req)
+    });
 });
 
 app.get('/cart', (req, res) => {
-    res.render('cart', { title: 'Shopping Cart - Sneaker Head' });
+    // Initialize cart if it doesn't exist
+    if (!req.session.cart) {
+        req.session.cart = [];
+    }
+
+    // Get cart items with product details
+    const cartItems = req.session.cart.map(cartItem => {
+        const product = shoes.find(shoe => shoe.id === cartItem.productId);
+        if (product) {
+            return {
+                productId: cartItem.productId,
+                quantity: cartItem.quantity,
+                isAvailable: product.inStock && product.isActive,
+                product: {
+                    name: product.name,
+                    brand: product.brand,
+                    price: product.price,
+                    image: product.image,
+                    stock: product.inStock ? 10 : 0 // Mock stock
+                },
+                subtotal: product.price * cartItem.quantity
+            };
+        }
+        return null;
+    }).filter(item => item !== null);
+
+    const cartCount = cartItems.reduce((total, item) => total + item.quantity, 0);
+    const cartTotal = cartItems.reduce((total, item) => total + item.subtotal, 0);
+
+    res.render('cart', { 
+        title: 'Shopping Cart - Sneaker Head',
+        cartItems: cartItems,
+        cartCount: cartCount,
+        cartTotal: cartTotal,
+        user: req.session.user || null
+    });
+});
+
+// Cart update route
+app.post('/cart/update', (req, res) => {
+    try {
+        const { productId, quantity } = req.body;
+        const parsedProductId = parseInt(productId);
+        const parsedQuantity = parseInt(quantity);
+
+        // Validate input
+        if (!parsedProductId || parsedQuantity < 0) {
+            return res.json({ success: false, error: 'Invalid product ID or quantity' });
+        }
+
+        // Initialize cart if it doesn't exist
+        if (!req.session.cart) {
+            req.session.cart = [];
+        }
+
+        // Find the product to validate it exists
+        const product = shoes.find(shoe => shoe.id === parsedProductId);
+        if (!product) {
+            return res.json({ success: false, error: 'Product not found' });
+        }
+
+        // Find cart item
+        const cartItemIndex = req.session.cart.findIndex(item => item.productId === parsedProductId);
+
+        if (parsedQuantity === 0) {
+            // Remove item if quantity is 0
+            if (cartItemIndex > -1) {
+                req.session.cart.splice(cartItemIndex, 1);
+            }
+        } else {
+            // Update or add item
+            if (cartItemIndex > -1) {
+                req.session.cart[cartItemIndex].quantity = parsedQuantity;
+            } else {
+                req.session.cart.push({
+                    productId: parsedProductId,
+                    quantity: parsedQuantity
+                });
+            }
+        }
+
+        console.log(`Cart updated: Product ${parsedProductId} to quantity ${parsedQuantity}`);
+        res.json({ success: true, message: 'Cart updated successfully' });
+    } catch (error) {
+        console.error('Cart update error:', error);
+        res.json({ success: false, error: 'Failed to update cart' });
+    }
+});
+
+// Cart remove route
+app.post('/cart/remove/:productId', (req, res) => {
+    try {
+        const productId = parseInt(req.params.productId);
+
+        // Initialize cart if it doesn't exist
+        if (!req.session.cart) {
+            req.session.cart = [];
+        }
+
+        // Remove item from cart
+        const initialLength = req.session.cart.length;
+        req.session.cart = req.session.cart.filter(item => item.productId !== productId);
+
+        if (req.session.cart.length < initialLength) {
+            console.log(`Product ${productId} removed from cart`);
+            res.json({ success: true, message: 'Item removed from cart' });
+        } else {
+            res.json({ success: false, error: 'Item not found in cart' });
+        }
+    } catch (error) {
+        console.error('Cart remove error:', error);
+        res.json({ success: false, error: 'Failed to remove item' });
+    }
+});
+
+// Add to cart route
+app.post('/cart/add', (req, res) => {
+    try {
+        const { productId, quantity = 1 } = req.body;
+        const parsedProductId = parseInt(productId);
+        const parsedQuantity = parseInt(quantity);
+
+        // Validate input
+        if (!parsedProductId || parsedQuantity < 1) {
+            return res.json({ success: false, error: 'Invalid product ID or quantity' });
+        }
+
+        // Find the product to validate it exists
+        const product = shoes.find(shoe => shoe.id === parsedProductId);
+        if (!product || !product.isActive) {
+            return res.json({ success: false, error: 'Product not found or unavailable' });
+        }
+
+        // Initialize cart if it doesn't exist
+        if (!req.session.cart) {
+            req.session.cart = [];
+        }
+
+        // Check if item already exists in cart
+        const existingItemIndex = req.session.cart.findIndex(item => item.productId === parsedProductId);
+
+        if (existingItemIndex > -1) {
+            // Update quantity
+            req.session.cart[existingItemIndex].quantity += parsedQuantity;
+        } else {
+            // Add new item
+            req.session.cart.push({
+                productId: parsedProductId,
+                quantity: parsedQuantity
+            });
+        }
+
+        console.log(`Product ${parsedProductId} added to cart (quantity: ${parsedQuantity})`);
+        res.json({ success: true, message: 'Item added to cart' });
+    } catch (error) {
+        console.error('Add to cart error:', error);
+        res.json({ success: false, error: 'Failed to add item to cart' });
+    }
+});
+
+app.get('/checkout', (req, res) => {
+    // Basic checkout page - you can expand this later
+    res.render('checkout', { 
+        title: 'Checkout - Sneaker Head',
+        user: req.session.user || null,
+        cartCount: getCartCount(req)
+    });
 });
 
 app.get('/wishlist', (req, res) => {
-    res.render('wishlist', { title: 'My Wishlist - Sneaker Head' });
+    res.render('wishlist', { 
+        title: 'My Wishlist - Sneaker Head',
+        user: req.session.user || null,
+        cartCount: getCartCount(req)
+    });
 });
 
 // Search API endpoint
 app.get('/api/search', (req, res) => {
     const query = req.query.q;
-    
+
     if (!query || query.length < 2) {
         return res.json({ results: [], message: 'Query too short' });
     }
-    
+
     const searchQuery = query.toLowerCase();
     const results = shoes.filter(shoe => {
         return shoe.name.toLowerCase().includes(searchQuery) ||
-               shoe.brand.toLowerCase().includes(searchQuery) ||
-               shoe.category.toLowerCase().includes(searchQuery) ||
-               shoe.colors.some(color => color.toLowerCase().includes(searchQuery)) ||
-               shoe.features.some(feature => feature.toLowerCase().includes(searchQuery)) ||
-               shoe.description.toLowerCase().includes(searchQuery);
+            shoe.brand.toLowerCase().includes(searchQuery) ||
+            shoe.category.toLowerCase().includes(searchQuery) ||
+            shoe.colors.some(color => color.toLowerCase().includes(searchQuery)) ||
+            shoe.features.some(feature => feature.toLowerCase().includes(searchQuery)) ||
+            shoe.description.toLowerCase().includes(searchQuery);
     });
-    
-    res.json({ 
+
+    res.json({
         results: results,
         count: results.length,
         query: query
@@ -762,11 +985,11 @@ app.get('/api/search', (req, res) => {
 app.get('/api/product/:id', (req, res) => {
     const productId = parseInt(req.params.id);
     const product = shoes.find(shoe => shoe.id === productId);
-    
+
     if (!product) {
         return res.status(404).json({ error: 'Product not found' });
     }
-    
+
     res.json(product);
 });
 
@@ -774,22 +997,24 @@ app.get('/api/product/:id', (req, res) => {
 app.get('/search', (req, res) => {
     const query = req.query.q || '';
     let results = [];
-    
+
     if (query && query.length >= 2) {
         const searchQuery = query.toLowerCase();
         results = shoes.filter(shoe => {
             return shoe.name.toLowerCase().includes(searchQuery) ||
-                   shoe.brand.toLowerCase().includes(searchQuery) ||
-                   shoe.category.toLowerCase().includes(searchQuery) ||
-                   shoe.colors.some(color => color.toLowerCase().includes(searchQuery)) ||
-                   shoe.features.some(feature => feature.toLowerCase().includes(searchQuery)) ||
-                   shoe.description.toLowerCase().includes(searchQuery);
+                shoe.brand.toLowerCase().includes(searchQuery) ||
+                shoe.category.toLowerCase().includes(searchQuery) ||
+                shoe.colors.some(color => color.toLowerCase().includes(searchQuery)) ||
+                shoe.features.some(feature => feature.toLowerCase().includes(searchQuery)) ||
+                shoe.description.toLowerCase().includes(searchQuery);
         });
     }
-    
-    res.render('search-results', { 
+
+    res.render('search-results', {
         results: results,
         query: query,
+        user: req.session.user || null,
+        cartCount: getCartCount(req),
         title: query ? `Search: ${query} - Sneaker Head` : 'Search - Sneaker Head'
     });
 });
@@ -805,14 +1030,14 @@ app.post('/contact', (req, res) => {
 app.post('/api/cart/add', (req, res) => {
     const { productId, size, color } = req.body;
     const shoe = shoes.find(s => s.id === parseInt(productId));
-    
+
     if (!shoe) {
         return res.status(404).json({ success: false, message: 'Product not found' });
     }
-    
+
     // In a real app, you'd save this to a database or session
-    res.json({ 
-        success: true, 
+    res.json({
+        success: true,
         message: `${shoe.name} added to cart!`,
         product: { ...shoe, selectedSize: size, selectedColor: color }
     });
@@ -821,7 +1046,7 @@ app.post('/api/cart/add', (req, res) => {
 // Track order (mock)
 app.get('/track/:orderId', (req, res) => {
     const orderId = req.params.orderId;
-    res.render('track-order', { 
+    res.render('track-order', {
         orderId,
         title: `Track Order ${orderId} - Sneaker Head`
     });
@@ -832,18 +1057,26 @@ app.use((req, res) => {
     res.status(404).render('404', { title: 'Page Not Found - Sneaker Head' });
 });
 
-function startServer(port) {
-    const server = app.listen(port, () => {
-        console.log(`🚀 Sneaker Head Store running on http://localhost:${port}`);
-        console.log('💫 Step into the future of footwear!');
-    }).on('error', (err) => {
-        if (err.code === 'EADDRINUSE') {
-            console.log(`❌ Port ${port} is busy, trying port ${port + 1}...`);
-            startServer(port + 1);
-        } else {
-            console.error('❌ Server error:', err);
-        }
-    });
+async function startServer(port) {
+    try {
+        // Connect to database first
+        await database.connect();
+        
+        const server = app.listen(port, () => {
+            console.log(`🚀 Sneaker Head Store running on http://localhost:${port}`);
+            console.log('💫 Step into the future of footwear!');
+        }).on('error', (err) => {
+            if (err.code === 'EADDRINUSE') {
+                console.log(`❌ Port ${port} is busy, trying port ${port + 1}...`);
+                startServer(port + 1);
+            } else {
+                console.error('❌ Server error:', err);
+            }
+        });
+    } catch (error) {
+        console.error('❌ Failed to start server:', error);
+        process.exit(1);
+    }
 }
 
 startServer(PORT);

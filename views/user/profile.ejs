@@ -1,0 +1,248 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title><%= title %></title>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="/css/style.css">
+    <style>
+        .profile-container {
+            max-width: 1200px;
+            margin: 2rem auto;
+            padding: 0 2rem;
+            margin-top: 120px;
+        }
+
+        .profile-header {
+            background: var(--bg-secondary);
+            border-radius: 1rem;
+            padding: 2rem;
+            margin-bottom: 2rem;
+            display: flex;
+            align-items: center;
+            gap: 2rem;
+        }
+
+        .profile-avatar {
+            width: 120px;
+            height: 120px;
+            border-radius: 50%;
+            object-fit: cover;
+            border: 4px solid var(--accent-primary);
+        }
+
+        .profile-info h1 {
+            color: var(--text-primary);
+            margin-bottom: 0.5rem;
+        }
+
+        .profile-info p {
+            color: var(--text-secondary);
+            margin-bottom: 0.25rem;
+        }
+
+        .profile-actions {
+            margin-top: 1rem;
+            display: flex;
+            gap: 1rem;
+        }
+
+        .profile-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 2rem;
+        }
+
+        .profile-section {
+            background: var(--bg-secondary);
+            border-radius: 1rem;
+            padding: 2rem;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .section-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1.5rem;
+        }
+
+        .section-title {
+            color: var(--text-primary);
+            font-size: 1.25rem;
+            font-weight: 600;
+        }
+
+        .address-card {
+            background: var(--bg-tertiary);
+            border-radius: 0.5rem;
+            padding: 1rem;
+            margin-bottom: 1rem;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .address-card.default {
+            border-color: var(--accent-primary);
+        }
+
+        .default-badge {
+            background: var(--accent-primary);
+            color: var(--bg-primary);
+            padding: 0.25rem 0.5rem;
+            border-radius: 0.25rem;
+            font-size: 0.75rem;
+            font-weight: 600;
+        }
+
+        .order-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 1rem;
+            background: var(--bg-tertiary);
+            border-radius: 0.5rem;
+            margin-bottom: 1rem;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .order-info h4 {
+            color: var(--text-primary);
+            margin-bottom: 0.25rem;
+        }
+
+        .order-info p {
+            color: var(--text-secondary);
+            font-size: 0.9rem;
+        }
+
+        .status-badge {
+            padding: 0.25rem 0.75rem;
+            border-radius: 1rem;
+            font-size: 0.8rem;
+            font-weight: 500;
+        }
+
+        .status-pending { background: #fef3c7; color: #92400e; }
+        .status-confirmed { background: #dbeafe; color: #1e40af; }
+        .status-shipped { background: #e0e7ff; color: #3730a3; }
+        .status-delivered { background: #d1fae5; color: #065f46; }
+        .status-cancelled { background: #fee2e2; color: #991b1b; }
+
+        @media (max-width: 768px) {
+            .profile-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .profile-header {
+                flex-direction: column;
+                text-align: center;
+            }
+        }
+    </style>
+</head>
+<body>
+    <%- include('../partials/navbar') %>
+
+    <div class="profile-container">
+        <!-- Profile Header -->
+        <div class="profile-header">
+            <img src="<%= user.profileImage || '/images/default-avatar.png' %>" alt="Profile" class="profile-avatar">
+            <div class="profile-info">
+                <h1><%= user.name %></h1>
+                <p><i class="fas fa-envelope"></i> <%= user.email %></p>
+                <p><i class="fas fa-phone"></i> <%= user.phone %></p>
+                <p><i class="fas fa-calendar"></i> Member since <%= new Date(user.createdAt).toLocaleDateString() %></p>
+                
+                <div class="profile-actions">
+                    <a href="/user/edit-profile" class="btn btn-primary">
+                        <i class="fas fa-edit"></i> Edit Profile
+                    </a>
+                    <a href="/user/change-password" class="btn btn-outline">
+                        <i class="fas fa-lock"></i> Change Password
+                    </a>
+                </div>
+            </div>
+        </div>
+
+        <!-- Profile Content -->
+        <div class="profile-grid">
+            <!-- Addresses Section -->
+            <div class="profile-section">
+                <div class="section-header">
+                    <h2 class="section-title">
+                        <i class="fas fa-map-marker-alt"></i> My Addresses
+                    </h2>
+                    <a href="/user/addresses" class="btn btn-small btn-outline">
+                        <i class="fas fa-cog"></i> Manage
+                    </a>
+                </div>
+                
+                <% if (addresses.length > 0) { %>
+                    <% addresses.slice(0, 2).forEach(address => { %>
+                        <div class="address-card <%= address.isDefault ? 'default' : '' %>">
+                            <div style="display: flex; justify-content: space-between; align-items: flex-start;">
+                                <div>
+                                    <h4><%= address.name %></h4>
+                                    <p><%= address.addressLine1 %></p>
+                                    <% if (address.addressLine2) { %>
+                                        <p><%= address.addressLine2 %></p>
+                                    <% } %>
+                                    <p><%= address.city %>, <%= address.state %> <%= address.zipCode %></p>
+                                    <p><%= address.phone %></p>
+                                </div>
+                                <% if (address.isDefault) { %>
+                                    <span class="default-badge">Default</span>
+                                <% } %>
+                            </div>
+                        </div>
+                    <% }); %>
+                    
+                    <% if (addresses.length > 2) { %>
+                        <p style="text-align: center; color: var(--text-muted);">
+                            +<%= addresses.length - 2 %> more addresses
+                        </p>
+                    <% } %>
+                <% } else { %>
+                    <p style="text-align: center; color: var(--text-muted); padding: 2rem;">
+                        No addresses added yet
+                    </p>
+                <% } %>
+            </div>
+
+            <!-- Recent Orders Section -->
+            <div class="profile-section">
+                <div class="section-header">
+                    <h2 class="section-title">
+                        <i class="fas fa-shopping-bag"></i> Recent Orders
+                    </h2>
+                    <a href="/user/orders" class="btn btn-small btn-outline">
+                        <i class="fas fa-list"></i> View All
+                    </a>
+                </div>
+                
+                <% if (recentOrders.length > 0) { %>
+                    <% recentOrders.forEach(order => { %>
+                        <div class="order-item">
+                            <div class="order-info">
+                                <h4>Order #<%= order.orderId %></h4>
+                                <p><%= new Date(order.createdAt).toLocaleDateString() %> • $<%= order.total.toFixed(2) %></p>
+                            </div>
+                            <span class="status-badge status-<%= order.status %>">
+                                <%= order.status.charAt(0).toUpperCase() + order.status.slice(1) %>
+                            </span>
+                        </div>
+                    <% }); %>
+                <% } else { %>
+                    <p style="text-align: center; color: var(--text-muted); padding: 2rem;">
+                        No orders yet
+                    </p>
+                <% } %>
+            </div>
+        </div>
+    </div>
+
+    <%- include('../partials/footer') %>
+</body>
+</html>

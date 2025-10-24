@@ -2,13 +2,13 @@ const User = require('../../models/User');
 
 class AdminUserController {
     // Display users management page
-    index(req, res) {
+    async index(req, res) {
         try {
             const page = parseInt(req.query.page) || 1;
             const limit = 10;
             const search = req.query.search || '';
             
-            const result = User.getPaginated(page, limit, search);
+            const result = await User.getPaginated(page, limit, search);
             
             res.render('admin/users', {
                 title: 'User Management - Sneaker Head',
@@ -30,10 +30,10 @@ class AdminUserController {
     }
 
     // Toggle user status (block/unblock)
-    toggleStatus(req, res) {
+    async toggleStatus(req, res) {
         try {
-            const userId = parseInt(req.params.id);
-            const user = User.toggleStatus(userId);
+            const userId = req.params.id;
+            const user = await User.toggleStatus(userId);
             
             if (user) {
                 res.json({ success: true, isActive: user.isActive });

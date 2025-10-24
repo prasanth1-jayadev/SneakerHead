@@ -7,6 +7,7 @@ const AdminDashboardController = require('../controllers/admin/AdminDashboardCon
 const AdminUserController = require('../controllers/admin/AdminUserController');
 const AdminCategoryController = require('../controllers/admin/AdminCategoryController');
 const AdminProductController = require('../controllers/admin/AdminProductController');
+const AdminOrderController = require('../controllers/admin/AdminOrderController');
 
 // Import middleware
 const { requireAdmin, redirectIfAuthenticated } = require('../middleware/auth');
@@ -35,5 +36,11 @@ router.post('/products', requireAdmin, AdminProductController.create);
 router.post('/products/:id/edit', requireAdmin, AdminProductController.update);
 router.post('/products/:id/toggle-status', requireAdmin, AdminProductController.toggleStatus);
 router.post('/products/:id/delete', requireAdmin, AdminProductController.delete);
+
+// Order management routes
+router.get('/orders', requireAdmin, AdminOrderController.index);
+router.get('/orders/:id', requireAdmin, AdminOrderController.show);
+router.post('/orders/:id/update-status', requireAdmin, AdminOrderController.updateStatus);
+router.get('/api/orders/stats', requireAdmin, AdminOrderController.getStats);
 
 module.exports = router;

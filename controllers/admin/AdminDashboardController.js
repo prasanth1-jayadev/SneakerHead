@@ -4,15 +4,22 @@ const Category = require('../../models/Category');
 
 class AdminDashboardController {
     // Display admin dashboard
-    index(req, res) {
+    async index(req, res) {
         try {
+            // Get data from MongoDB
+            const [nonAdminUsers, allProducts, allCategories] = await Promise.all([
+                User.getNonAdminUsers(),
+                Promise.resolve(Product.getAll()),
+                Promise.resolve(Category.getAll())
+            ]);
+            
             const stats = {
-                totalUsers: User.getNonAdminUsers().length,
-                activeUsers: User.getNonAdminUsers().filter(u => u.isActive).length,
-                totalProducts: Product.getAll().length,
-                activeProducts: Product.getActive().length,
-                totalCategories: Category.getAll().length,
-                activeCategories: Category.getActive().length
+                totalUsers: nonAdminUsers.length,
+                activeUsers: nonAdminUsers.filter(u => u.isActive).length,
+                totalProducts: allProducts.length,
+                activeProducts: allProducts.filter(p => p.isActive).length,
+                totalCategories: allCategories.length,
+                activeCategories: allCategories.filter(c => c.isActive).length
             };
             
             res.render('admin/dashboard', { 

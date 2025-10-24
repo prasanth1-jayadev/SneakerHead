@@ -1,0 +1,211 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title><%= title %></title>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="/css/admin.css">
+</head>
+<body>
+    <%- include('../partials/admin-navbar') %>
+    
+    <div class="admin-container">
+        <div class="admin-content">
+            <div class="page-header">
+                <h1><i class="fas fa-receipt"></i> Order Details</h1>
+                <div class="breadcrumb">
+                    <a href="/admin/dashboard">Dashboard</a> > 
+                    <a href="/admin/orders">Orders</a> > 
+                    <span>Order <%= order.orderId %></span>
+                </div>
+            </div>
+
+            <div class="order-detail-container">
+                <div class="order-info-grid">
+                    <!-- Order Information -->
+                    <div class="order-info-card">
+                        <h3><i class="fas fa-info-circle"></i> Order Information</h3>
+                        <div class="info-row">
+                            <span class="label">Order ID:</span>
+                            <span class="value"><%= order.orderId %></span>
+                        </div>
+                        <div class="info-row">
+                            <span class="label">Status:</span>
+                            <span class="value status-<%= order.status %>"><%= order.status.replace('_', ' ').toUpperCase() %></span>
+                        </div>
+                        <div class="info-row">
+                            <span class="label">Order Date:</span>
+                            <span class="value"><%= new Date(order.createdAt).toLocaleDateString() %></span>
+                        </div>
+                        <div class="info-row">
+                            <span class="label">Payment Method:</span>
+                            <span class="value"><%= order.paymentMethod %></span>
+                        </div>
+                    </div>
+
+                    <!-- Customer Information -->
+                    <div class="order-info-card">
+                        <h3><i class="fas fa-user"></i> Customer Information</h3>
+                        <% if (customer) { %>
+                            <div class="info-row">
+                                <span class="label">Name:</span>
+                                <span class="value"><%= customer.name %></span>
+                            </div>
+                            <div class="info-row">
+                                <span class="label">Email:</span>
+                                <span class="value"><%= customer.email %></span>
+                            </div>
+                            <div class="info-row">
+                                <span class="label">Phone:</span>
+                                <span class="value"><%= customer.phone || 'N/A' %></span>
+                            </div>
+                        <% } else { %>
+                            <p>Customer information not available</p>
+                        <% } %>
+                    </div>
+
+                    <!-- Shipping Address -->
+                    <div class="order-info-card">
+                        <h3><i class="fas fa-shipping-fast"></i> Shipping Address</h3>
+                        <div class="address">
+                            <p><%= order.shippingAddress.name %></p>
+                            <p><%= order.shippingAddress.addressLine1 %></p>
+                            <% if (order.shippingAddress.addressLine2) { %>
+                                <p><%= order.shippingAddress.addressLine2 %></p>
+                            <% } %>
+                            <p><%= order.shippingAddress.city %>, <%= order.shippingAddress.state %> <%= order.shippingAddress.zipCode %></p>
+                            <p><%= order.shippingAddress.country %></p>
+                            <p>Phone: <%= order.shippingAddress.phone %></p>
+                        </div>
+                    </div>
+
+                    <!-- Order Status Update -->
+                    <div class="order-info-card">
+                        <h3><i class="fas fa-edit"></i> Update Status</h3>
+                        <form id="statusUpdateForm">
+                            <div class="form-group">
+                                <label for="status">Status:</label>
+                                <select id="status" name="status" class="form-control">
+                                    <option value="pending" <%= order.status === 'pending' ? 'selected' : '' %>>Pending</option>
+                                    <option value="confirmed" <%= order.status === 'confirmed' ? 'selected' : '' %>>Confirmed</option>
+                                    <option value="shipped" <%= order.status === 'shipped' ? 'selected' : '' %>>Shipped</option>
+                                    <option value="out_for_delivery" <%= order.status === 'out_for_delivery' ? 'selected' : '' %>>Out for Delivery</option>
+                                    <option value="delivered" <%= order.status === 'delivered' ? 'selected' : '' %>>Delivered</option>
+                                    <option value="cancelled" <%= order.status === 'cancelled' ? 'selected' : '' %>>Cancelled</option>
+                                    <option value="returned" <%= order.status === 'returned' ? 'selected' : '' %>>Returned</option>
+                                </select>
+                            </div>
+                            <div class="form-group">
+                                <label for="reason">Reason (optional):</label>
+                                <textarea id="reason" name="reason" class="form-control" placeholder="Enter reason for status change..."></textarea>
+                            </div>
+                            <button type="submit" class="btn btn-primary">
+                                <i class="fas fa-save"></i> Update Status
+                            </button>
+                        </form>
+                    </div>
+                </div>
+
+                <!-- Order Items -->
+                <div class="order-items-section">
+                    <h3><i class="fas fa-box"></i> Order Items</h3>
+                    <div class="items-table">
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>Product</th>
+                                    <th>Price</th>
+                                    <th>Quantity</th>
+                                    <th>Total</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <% order.items.forEach(item => { %>
+                                    <tr>
+                                        <td>
+                                            <div class="product-info">
+                                                <% if (item.product) { %>
+                                                    <img src="<%= item.product.image %>" alt="<%= item.product.name %>" class="product-image">
+                                                    <div>
+                                                        <div class="product-name"><%= item.product.name %></div>
+                                                        <div class="product-brand"><%= item.product.brand %></div>
+                                                    </div>
+                                                <% } else { %>
+                                                    <div>Product not found</div>
+                                                <% } %>
+                                            </div>
+                                        </td>
+                                        <td>$<%= item.price.toFixed(2) %></td>
+                                        <td><%= item.quantity %></td>
+                                        <td>$<%= item.total.toFixed(2) %></td>
+                                    </tr>
+                                <% }); %>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <!-- Order Summary -->
+                <div class="order-summary">
+                    <h3><i class="fas fa-calculator"></i> Order Summary</h3>
+                    <div class="summary-row">
+                        <span>Subtotal:</span>
+                        <span>$<%= order.subtotal.toFixed(2) %></span>
+                    </div>
+                    <div class="summary-row">
+                        <span>Tax:</span>
+                        <span>$<%= order.tax.toFixed(2) %></span>
+                    </div>
+                    <div class="summary-row">
+                        <span>Shipping:</span>
+                        <span>$<%= order.shipping.toFixed(2) %></span>
+                    </div>
+                    <% if (order.discount > 0) { %>
+                        <div class="summary-row">
+                            <span>Discount:</span>
+                            <span>-$<%= order.discount.toFixed(2) %></span>
+                        </div>
+                    <% } %>
+                    <div class="summary-row total">
+                        <span>Total:</span>
+                        <span>$<%= order.total.toFixed(2) %></span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        document.getElementById('statusUpdateForm').addEventListener('submit', async function(e) {
+            e.preventDefault();
+            
+            const status = document.getElementById('status').value;
+            const reason = document.getElementById('reason').value;
+            
+            try {
+                const response = await fetch(`/admin/orders/<%= order.id %>/update-status`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({ status, reason })
+                });
+                
+                const data = await response.json();
+                
+                if (data.success) {
+                    alert('Order status updated successfully!');
+                    location.reload();
+                } else {
+                    alert(data.error || 'Failed to update order status');
+                }
+            } catch (error) {
+                console.error('Error updating order status:', error);
+                alert('An error occurred while updating the order status');
+            }
+        });
+    </script>
+</body>
+</html>

@@ -42,6 +42,9 @@ function initializeApp() {
     
     // Initialize wishlist icons based on current wishlist
     initializeWishlistIcons();
+    
+    // Update cart count on page load
+    updateCartCount();
 }
 
 // Loading Screen
@@ -98,9 +101,30 @@ function initializeMobileMenu() {
     const mobileMenu = document.getElementById('mobile-menu');
     
     if (mobileToggle && mobileMenu) {
-        mobileToggle.addEventListener('click', () => {
-            mobileMenu.style.display = mobileMenu.style.display === 'block' ? 'none' : 'block';
+        mobileToggle.addEventListener('click', (e) => {
+            e.stopPropagation();
+            mobileMenu.classList.toggle('active');
             mobileToggle.classList.toggle('active');
+            document.body.classList.toggle('mobile-menu-open');
+        });
+        
+        // Close mobile menu when clicking outside
+        document.addEventListener('click', (e) => {
+            if (!e.target.closest('.mobile-menu') && !e.target.closest('.mobile-menu-toggle')) {
+                mobileMenu.classList.remove('active');
+                mobileToggle.classList.remove('active');
+                document.body.classList.remove('mobile-menu-open');
+            }
+        });
+        
+        // Close mobile menu when clicking on links
+        const mobileLinks = mobileMenu.querySelectorAll('.mobile-nav-link');
+        mobileLinks.forEach(link => {
+            link.addEventListener('click', () => {
+                mobileMenu.classList.remove('active');
+                mobileToggle.classList.remove('active');
+                document.body.classList.remove('mobile-menu-open');
+            });
         });
     }
 }
@@ -272,7 +296,7 @@ function initializeCart() {
             {id: 4, name: "Classic White Minimalist", brand: "SneakerHead", price: 199, image: "https://images.unsplash.com/photo-1549298916-b41d501d3772?w=500&h=500&fit=crop&crop=center"},
 
             {id: 5, name: "Vans Skate Pro", brand: "SneakerHead", price: 179, image: "https://images.unsplash.com/photo-1525966222134-fcfa99b8ae77?w=500&h=500&fit=crop&crop=center"},
-            {id: 6, name: "Adidas Ultra Boost", brand: "SneakerHead", price: 329, image: "https://images.unsplash.com/photo-1608231387042-66d1773070a5?w=500&h=500&fit=crop&crop=center"},
+            {id: 6, name: "Adidas Ultra Boost", brand: "SneakerHead", price: 329, image: "https://images.unsplash.com/photo-1542291026-7eec264c27ff?w=500&h=500&fit=crop&crop=center"},
             {id: 7, name: "Puma RS-X Futuristic", brand: "SneakerHead", price: 219, image: "https://images.unsplash.com/photo-1605348532760-6753d2c43329?w=500&h=500&fit=crop&crop=center"},
             {id: 8, name: "New Balance 990v5", brand: "SneakerHead", price: 289, image: "https://images.unsplash.com/photo-1539185441755-769473a23570?w=500&h=500&fit=crop&crop=center"},
             {id: 9, name: "Yeezy Boost 350 V2", brand: "SneakerHead", price: 449, image: "https://images.unsplash.com/photo-1544966503-7cc5ac882d5f?w=500&h=500&fit=crop&crop=center"},
@@ -1243,3 +1267,257 @@ window.UrbanLuxury = {
     },
     openQuickView
 };
+
+// Cart Management Functions
+async function addToCart(productId, quantity = 1) {
+    try {
+        const response = await fetch('/cart/add', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({ productId, quantity })
+        });
+
+        const data = await response.json();
+        
+        if (data.success) {
+            // Update cart count
+            updateCartCount();
+            
+            // Show success message
+            showNotification('Item added to cart successfully!', 'success');
+            
+            // Update button state
+            const addButton = document.querySelector(`[data-product-id="${productId}"] .add-to-cart-btn`);
+            if (addButton) {
+                addButton.innerHTML = '<i class="fas fa-check"></i> Added';
+                addButton.classList.add('added');
+                setTimeout(() => {
+                    addButton.innerHTML = '<i class="fas fa-shopping-bag"></i>';
+                    addButton.classList.remove('added');
+                }, 2000);
+            }
+        } else {
+            showNotification(data.error || 'Failed to add item to cart', 'error');
+        }
+    } catch (error) {
+        console.error('Error adding to cart:', error);
+        showNotification('An error occurred while adding to cart', 'error');
+    }
+}
+
+async function updateCartCount() {
+    try {
+        const response = await fetch('/api/cart/count');
+        const data = await response.json();
+        
+        const cartCountElement = document.getElementById('cart-count');
+        if (cartCountElement) {
+            cartCountElement.textContent = data.cartCount || 0;
+            
+            // Add animation when count changes
+            if (data.cartCount > 0) {
+                cartCountElement.style.display = 'flex';
+                cartCountElement.classList.add('bounce');
+                setTimeout(() => {
+                    cartCountElement.classList.remove('bounce');
+                }, 300);
+            } else {
+                cartCountElement.style.display = 'none';
+            }
+        }
+    } catch (error) {
+        console.error('Error updating cart count:', error);
+    }
+}
+
+// Add event listeners for add to cart buttons
+document.addEventListener('click', function(e) {
+    if (e.target.closest('.add-to-cart-btn')) {
+        e.preventDefault();
+        const button = e.target.closest('.add-to-cart-btn');
+        const productId = button.dataset.productId;
+        
+        if (productId) {
+            addToCart(productId);
+        }
+    }
+});
+
+// Notification System
+function showNotification(message, type = 'info') {
+    // Remove existing notifications
+    const existingNotifications = document.querySelectorAll('.notification');
+    existingNotifications.forEach(notification => notification.remove());
+    
+    // Create notification element
+    const notification = document.createElement('div');
+    notification.className = `notification notification-${type}`;
+    notification.innerHTML = `
+        <div class="notification-content">
+            <i class="fas fa-${type === 'success' ? 'check-circle' : type === 'error' ? 'exclamation-circle' : 'info-circle'}"></i>
+            <span>${message}</span>
+            <button class="notification-close" onclick="this.parentElement.parentElement.remove()">
+                <i class="fas fa-times"></i>
+            </button>
+        </div>
+    `;
+    
+    // Add styles if not already added
+    if (!document.querySelector('#notification-styles')) {
+        const styles = document.createElement('style');
+        styles.id = 'notification-styles';
+        styles.textContent = `
+            .notification {
+                position: fixed;
+                top: 100px;
+                right: 20px;
+                z-index: 10000;
+                background: var(--bg-secondary);
+                border: 1px solid rgba(255, 255, 255, 0.1);
+                border-radius: 10px;
+                padding: 1rem;
+                box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+                animation: slideInRight 0.3s ease-out;
+                max-width: 400px;
+            }
+            
+            .notification-success {
+                border-left: 4px solid var(--accent-primary);
+            }
+            
+            .notification-error {
+                border-left: 4px solid var(--error);
+            }
+            
+            .notification-content {
+                display: flex;
+                align-items: center;
+                gap: 0.5rem;
+                color: var(--text-primary);
+            }
+            
+            .notification-close {
+                background: none;
+                border: none;
+                color: var(--text-muted);
+                cursor: pointer;
+                margin-left: auto;
+                padding: 0.25rem;
+            }
+            
+            @keyframes slideInRight {
+                from {
+                    transform: translateX(100%);
+                    opacity: 0;
+                }
+                to {
+                    transform: translateX(0);
+                    opacity: 1;
+                }
+            }
+        `;
+        document.head.appendChild(styles);
+    }
+    
+    // Add to page
+    document.body.appendChild(notification);
+    
+    // Auto remove after 5 seconds
+    setTimeout(() => {
+        if (notification.parentElement) {
+            notification.remove();
+        }
+    }, 5000);
+}
+
+// Profile dropdown functionality
+document.addEventListener('click', function(e) {
+    const profileBtn = e.target.closest('.profile-btn');
+    const dropdown = document.querySelector('.nav-dropdown');
+    
+    if (profileBtn && dropdown) {
+        e.preventDefault();
+        dropdown.classList.toggle('active');
+    } else if (!e.target.closest('.nav-dropdown')) {
+        // Close dropdown when clicking outside
+        if (dropdown) {
+            dropdown.classList.remove('active');
+        }
+    }
+});
+
+// Add CSS for profile dropdown if not already added
+if (!document.querySelector('#profile-dropdown-styles')) {
+    const styles = document.createElement('style');
+    styles.id = 'profile-dropdown-styles';
+    styles.textContent = `
+        .nav-dropdown {
+            position: relative;
+        }
+        
+        .profile-avatar {
+            width: 30px;
+            height: 30px;
+            border-radius: 50%;
+            object-fit: cover;
+            margin-right: 0.5rem;
+        }
+        
+        .profile-name {
+            display: none;
+        }
+        
+        .dropdown-menu {
+            position: absolute;
+            top: 100%;
+            right: 0;
+            background: var(--bg-secondary);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 10px;
+            padding: 0.5rem 0;
+            min-width: 200px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+            opacity: 0;
+            visibility: hidden;
+            transform: translateY(-10px);
+            transition: all 0.3s ease;
+            z-index: 1000;
+        }
+        
+        .nav-dropdown.active .dropdown-menu {
+            opacity: 1;
+            visibility: visible;
+            transform: translateY(0);
+        }
+        
+        .dropdown-item {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            padding: 0.75rem 1rem;
+            color: var(--text-secondary);
+            text-decoration: none;
+            transition: all 0.3s ease;
+        }
+        
+        .dropdown-item:hover {
+            background: rgba(255, 255, 255, 0.1);
+            color: var(--text-primary);
+        }
+        
+        .dropdown-divider {
+            height: 1px;
+            background: rgba(255, 255, 255, 0.1);
+            margin: 0.5rem 0;
+        }
+        
+        @media (min-width: 768px) {
+            .profile-name {
+                display: inline;
+            }
+        }
+    `;
+    document.head.appendChild(styles);
+}

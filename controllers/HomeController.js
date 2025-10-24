@@ -41,13 +41,7 @@ class HomeController {
         });
     }
 
-    // Display cart page
-    cart(req, res) {
-        res.render('cart', { 
-            title: 'Shopping Cart - Sneaker Head',
-            user: req.session.user || null
-        });
-    }
+    // This method is now handled by CartController
 
     // Display wishlist page
     wishlist(req, res) {

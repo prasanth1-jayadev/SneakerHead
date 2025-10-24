@@ -1,0 +1,323 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title><%= title %></title>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="/css/style.css">
+    <style>
+        .orders-page {
+            padding: 2rem 0;
+            margin-top: 80px;
+            min-height: 70vh;
+        }
+
+        .orders-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 2rem;
+        }
+
+        .page-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 2rem;
+        }
+
+        .search-section {
+            background: var(--bg-secondary);
+            border-radius: 1rem;
+            padding: 1.5rem;
+            margin-bottom: 2rem;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .search-form {
+            display: flex;
+            gap: 1rem;
+            align-items: center;
+        }
+
+        .search-input {
+            flex: 1;
+            padding: 0.75rem;
+            background: var(--bg-tertiary);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            border-radius: 0.5rem;
+            color: var(--text-primary);
+        }
+
+        .order-card {
+            background: var(--bg-secondary);
+            border-radius: 1rem;
+            padding: 1.5rem;
+            margin-bottom: 1rem;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            transition: all 0.3s ease;
+        }
+
+        .order-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+        }
+
+        .order-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            margin-bottom: 1rem;
+        }
+
+        .order-info h3 {
+            color: var(--text-primary);
+            margin-bottom: 0.25rem;
+        }
+
+        .order-info p {
+            color: var(--text-secondary);
+            font-size: 0.9rem;
+        }
+    </style>
+</head> 
+       .status-badge {
+            padding: 0.5rem 1rem;
+            border-radius: 2rem;
+            font-size: 0.8rem;
+            font-weight: 600;
+            text-transform: uppercase;
+        }
+
+        .status-pending { background: #fef3c7; color: #92400e; }
+        .status-confirmed { background: #dbeafe; color: #1e40af; }
+        .status-shipped { background: #e0e7ff; color: #3730a3; }
+        .status-out_for_delivery { background: #f3e8ff; color: #7c3aed; }
+        .status-delivered { background: #d1fae5; color: #065f46; }
+        .status-cancelled { background: #fee2e2; color: #991b1b; }
+        .status-returned { background: #f1f5f9; color: #475569; }
+
+        .order-actions {
+            display: flex;
+            gap: 0.5rem;
+            margin-top: 1rem;
+        }
+
+        .btn-small {
+            padding: 0.5rem 1rem;
+            font-size: 0.8rem;
+        }
+
+        .pagination {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 1rem;
+            margin-top: 2rem;
+        }
+
+        .pagination a {
+            padding: 0.5rem 1rem;
+            background: var(--bg-secondary);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            border-radius: 0.5rem;
+            color: var(--text-secondary);
+            text-decoration: none;
+            transition: all 0.3s ease;
+        }
+
+        .pagination a.active {
+            background: var(--accent-primary);
+            color: var(--bg-primary);
+            border-color: var(--accent-primary);
+        }
+
+        .empty-orders {
+            text-align: center;
+            padding: 4rem 2rem;
+            color: var(--text-muted);
+        }
+
+        .empty-orders i {
+            font-size: 4rem;
+            margin-bottom: 1rem;
+        }
+
+        @media (max-width: 768px) {
+            .order-header {
+                flex-direction: column;
+                gap: 1rem;
+            }
+
+            .order-actions {
+                flex-wrap: wrap;
+            }
+        }
+    </style>
+</head>
+<body>
+    <%- include('../partials/navbar') %>
+
+    <section class="orders-page">
+        <div class="orders-container">
+            <div class="page-header">
+                <h1>My Orders</h1>
+                <a href="/user/profile" class="btn btn-outline">
+                    <i class="fas fa-user"></i> Back to Profile
+                </a>
+            </div>
+
+            <!-- Search Section -->
+            <div class="search-section">
+                <form class="search-form" method="GET">
+                    <input type="text" name="search" class="search-input" 
+                           placeholder="Search by order number or status..." value="<%= search %>">
+                    <button type="submit" class="btn btn-primary">
+                        <i class="fas fa-search"></i> Search
+                    </button>
+                    <% if (search) { %>
+                        <a href="/user/orders" class="btn btn-secondary">
+                            <i class="fas fa-times"></i> Clear
+                        </a>
+                    <% } %>
+                </form>
+            </div>
+
+            <!-- Orders List -->
+            <% if (orders && orders.length > 0) { %>
+                <% orders.forEach(order => { %>
+                    <div class="order-card">
+                        <div class="order-header">
+                            <div class="order-info">
+                                <h3>Order #<%= order.orderId %></h3>
+                                <p>Placed on <%= new Date(order.createdAt).toLocaleDateString() %></p>
+                                <p><%= order.items.length %> item(s) • Total: $<%= order.total.toFixed(2) %></p>
+                            </div>
+                            <span class="status-badge status-<%= order.status %>">
+                                <%= order.status.replace('_', ' ').replace(/\b\w/g, l => l.toUpperCase()) %>
+                            </span>
+                        </div>
+
+                        <div class="order-actions">
+                            <a href="/user/orders/<%= order.id %>" class="btn btn-primary btn-small">
+                                <i class="fas fa-eye"></i> View Details
+                            </a>
+                            
+                            <% if (order.status === 'pending' || order.status === 'confirmed') { %>
+                                <button class="btn btn-danger btn-small" onclick="cancelOrder(<%= order.id %>)">
+                                    <i class="fas fa-times"></i> Cancel Order
+                                </button>
+                            <% } %>
+                            
+                            <% if (order.status === 'delivered') { %>
+                                <button class="btn btn-secondary btn-small" onclick="returnOrder(<%= order.id %>)">
+                                    <i class="fas fa-undo"></i> Return Order
+                                </button>
+                            <% } %>
+                        </div>
+                    </div>
+                <% }); %>
+
+                <!-- Pagination -->
+                <% if (totalPages > 1) { %>
+                    <div class="pagination">
+                        <% if (currentPage > 1) { %>
+                            <a href="?page=<%= currentPage - 1 %><%= search ? '&search=' + encodeURIComponent(search) : '' %>">
+                                <i class="fas fa-chevron-left"></i> Previous
+                            </a>
+                        <% } %>
+                        
+                        <% for (let i = 1; i <= totalPages; i++) { %>
+                            <a href="?page=<%= i %><%= search ? '&search=' + encodeURIComponent(search) : '' %>" 
+                               class="<%= i === currentPage ? 'active' : '' %>">
+                                <%= i %>
+                            </a>
+                        <% } %>
+                        
+                        <% if (currentPage < totalPages) { %>
+                            <a href="?page=<%= currentPage + 1 %><%= search ? '&search=' + encodeURIComponent(search) : '' %>">
+                                Next <i class="fas fa-chevron-right"></i>
+                            </a>
+                        <% } %>
+                    </div>
+                <% } %>
+            <% } else { %>
+                <div class="empty-orders">
+                    <i class="fas fa-shopping-bag"></i>
+                    <h2>No orders found</h2>
+                    <p>You haven't placed any orders yet.</p>
+                    <a href="/products" class="btn btn-primary" style="margin-top: 1rem;">
+                        <i class="fas fa-shopping-bag"></i> Start Shopping
+                    </a>
+                </div>
+            <% } %>
+        </div>
+    </section>
+
+    <%- include('../partials/footer') %>
+
+    <script>
+        async function cancelOrder(orderId) {
+            const reason = prompt('Please provide a reason for cancellation (optional):');
+            
+            if (confirm('Are you sure you want to cancel this order?')) {
+                try {
+                    const response = await fetch(`/user/orders/${orderId}/cancel`, {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json'
+                        },
+                        body: JSON.stringify({ reason: reason || '' })
+                    });
+
+                    const data = await response.json();
+                    
+                    if (data.success) {
+                        alert('Order cancelled successfully');
+                        location.reload();
+                    } else {
+                        alert(data.error || 'Failed to cancel order');
+                    }
+                } catch (error) {
+                    console.error('Error cancelling order:', error);
+                    alert('An error occurred while cancelling the order');
+                }
+            }
+        }
+
+        async function returnOrder(orderId) {
+            const reason = prompt('Please provide a reason for return (required):');
+            
+            if (!reason || reason.trim() === '') {
+                alert('Return reason is required');
+                return;
+            }
+
+            if (confirm('Are you sure you want to return this order?')) {
+                try {
+                    const response = await fetch(`/user/orders/${orderId}/return`, {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json'
+                        },
+                        body: JSON.stringify({ reason: reason.trim() })
+                    });
+
+                    const data = await response.json();
+                    
+                    if (data.success) {
+                        alert('Return request submitted successfully');
+                        location.reload();
+                    } else {
+                        alert(data.error || 'Failed to submit return request');
+                    }
+                } catch (error) {
+                    console.error('Error submitting return request:', error);
+                    alert('An error occurred while submitting the return request');
+                }
+            }
+        }
+    </script>
+</body>
+</html>
